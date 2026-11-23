@@ -1439,84 +1439,46 @@ const CONFIG = {
 /* ═══════════════════════════════════════════
    APPLY CONFIG
 ═══════════════════════════════════════════ */
-function applyConfig() {
-  try {
-    // Name
-    document.querySelectorAll('.birthday-name').forEach(el => el.textContent = CONFIG.friendName);
-    const ch = document.querySelector('.count-heading');
-    if (ch) ch.innerHTML = `Happy Birthday<br><span>${CONFIG.friendName}</span> 🎀`;
+(function applyConfig() {
+  // Name
+  document.querySelectorAll('.birthday-name').forEach(el => el.textContent = CONFIG.friendName);
+  document.querySelector('.count-heading').innerHTML = `Happy Birthday<br><span>${CONFIG.friendName}</span> 🎀`;
 
-    // Profile picture
-    if (CONFIG.profilePicUrl) {
-      ['lock-img','passcode-img'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const isLock = id === 'lock-img';
-        const img = document.createElement('img');
-        img.src = CONFIG.profilePicUrl;
-        img.id = id;
-        img.alt = 'Profile';
-        img.className = isLock ? 'profile-img' : 'passcode-profile';
-        img.onerror = function() {
-          const ph = document.createElement('div');
-          ph.className = isLock ? 'profile-placeholder' : 'passcode-profile-placeholder';
-          ph.textContent = CONFIG.profileEmoji;
-          this.replaceWith(ph);
-        };
-        el.replaceWith(img);
-      });
-    } else {
-      const li = document.getElementById('lock-img');
-      const pi = document.getElementById('passcode-img');
-      if (li) li.textContent = CONFIG.profileEmoji;
-      if (pi) pi.textContent = CONFIG.profileEmoji;
-    }
-
-    // Gallery photos
-    if (CONFIG.galleryPhotos && CONFIG.galleryPhotos.length > 0) {
-      const slider = document.getElementById('gallery-slider');
-      if (slider) {
-        slider.innerHTML = '';
-        CONFIG.galleryPhotos.forEach((url, i) => {
-          const slide = document.createElement('div');
-          slide.className = 'gallery-slide';
-          const img = document.createElement('img');
-          img.src = url;
-          img.alt = 'Memory ' + (i + 1);
-          img.onerror = function() {
-            const ph = document.createElement('div');
-            ph.className = 'photo-placeholder';
-            ph.innerHTML = '🌹<p>Memory ' + (i + 1) + '</p>';
-            this.replaceWith(ph);
-          };
-          slide.appendChild(img);
-          slider.appendChild(slide);
-        });
-      }
-    }
-
-    // Music
-    if (CONFIG.musicUrl) {
-      const audio = document.getElementById('bg-music');
-      if (audio) {
-        const src = document.createElement('source');
-        src.src = CONFIG.musicUrl;
-        src.type = 'audio/mpeg';
-        audio.appendChild(src);
-      }
-    }
-
-    // Birthday countdown
-    calcBirthdayAge();
-
-    // Gallery dots
-    buildGalleryDots();
-  } catch(e) {
-    console.warn('applyConfig error:', e);
+  // Profile picture
+  if (CONFIG.profilePicUrl) {
+    ['lock-img','passcode-img'].forEach(id => {
+      const el = document.getElementById(id);
+      el.outerHTML = `<img src="${CONFIG.profilePicUrl}" class="${id === 'lock-img' ? 'profile-img' : 'passcode-profile'}" id="${id}" alt="Profile" onerror="this.outerHTML='<div class=&quot;${id === 'lock-img' ? 'profile-placeholder' : 'passcode-profile-placeholder'}&quot;>${CONFIG.profileEmoji}</div>'">`;
+    });
+  } else {
+    document.getElementById('lock-img').textContent = CONFIG.profileEmoji;
+    document.getElementById('passcode-img').textContent = CONFIG.profileEmoji;
   }
-}
 
-document.addEventListener('DOMContentLoaded', applyConfig);
+  // Gallery photos
+  if (CONFIG.galleryPhotos.length > 0) {
+    const slider = document.getElementById('gallery-slider');
+    slider.innerHTML = '';
+    CONFIG.galleryPhotos.forEach((url, i) => {
+      const slide = document.createElement('div');
+      slide.className = 'gallery-slide';
+      slide.innerHTML = `<img src="${url}" alt="Memory ${i+1}" onerror="this.parentElement.innerHTML='<div class=photo-placeholder>🌹<p>Memory ${i+1}</p></div>'">`;
+      slider.appendChild(slide);
+    });
+  }
+
+  // Music
+  if (CONFIG.musicUrl) {
+    const audio = document.getElementById('bg-music');
+    audio.innerHTML = `<source src="${CONFIG.musicUrl}" type="audio/mpeg">`;
+  }
+
+  // Birthday countdown
+  calcBirthdayAge();
+
+  // Gallery dots
+  buildGalleryDots();
+})();
 
 function calcBirthdayAge() {
   const bd = new Date(CONFIG.birthdayDate);
