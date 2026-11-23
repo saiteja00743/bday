@@ -1033,15 +1033,33 @@
       border-radius: 20px;
       overflow: hidden;
       border: 1px solid rgba(200, 16, 46, .25);
-      box-shadow: 0 0 40px rgba(200, 16, 46, .2)
+      box-shadow: 0 0 40px rgba(200, 16, 46, .2);
+      position: relative;
     }
 
     .gal-slide img,
     .photo-ph {
       width: 100%;
-      height: 300px;
+      height: clamp(300px, 45vh, 400px);
       object-fit: cover;
-      display: block
+      display: block;
+    }
+
+    .gal-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 24px 16px 14px;
+      background: linear-gradient(to top, rgba(0, 0, 0, .88) 0%, rgba(0, 0, 0, .45) 60%, transparent 100%);
+      font-family: var(--fs);
+      font-style: italic;
+      font-size: 15px;
+      color: rgba(255, 255, 255, .95);
+      text-align: center;
+      letter-spacing: .04em;
+      pointer-events: none;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
     }
 
     .photo-ph {
@@ -1605,10 +1623,19 @@
     var CFG = {
       name: "Kayala Varshini",        // ← her name
       passcode: "2811",               // ← 4-digit secret code (Birthday: 28/11 or 2005)
-      profilePic: "",                 // ← photo URL (leave "" for emoji)
+      profilePic: "profile.jpg",      // ← photo URL
       emoji: "🌸",                    // ← placeholder emoji
       birthday: "2005-11-28",         // ← YYYY-MM-DD
-      photos: [],                     // ← ["url1","url2",...]
+      photos: [
+        { url: "1.jpg", caption: "Where it all began... so adorable! 🥺✨" },
+        { url: "3.jpg", caption: "Pure festive joy & your contagious smile 🌸" },
+        { url: "4.jpg", caption: "A bouquet for the prettiest flower 💐❤️" },
+        { url: "5.jpg", caption: "That sweet smile that brightens any room 💖" },
+        { url: "6.jpg", caption: "Radiant, happy & glowing in red 🌹" },
+        { url: "7.jpg", caption: "Pure grace, poise & elegance 💫" },
+        { url: "8.jpg", caption: "Peaceful vibes by the lake 🌊✨" },
+        { url: "2.jpeg", caption: "A true masterpiece, just like you 🎨❤️" }
+      ],
       musicUrl: "",                   // ← mp3 URL
       showNums: false,                // ← true=show digits, false=show dots
     };
@@ -1679,8 +1706,9 @@
       if (!el) return;
       var img = document.createElement("img");
       img.src = src;
-      img.className = "pass-ph-img";
+      img.className = cls === "profile-ph" ? "profile-img" : "pass-ph-img";
       img.id = id;
+      img.alt = "Kayala Varshini";
       img.onerror = function () { this.outerHTML = '<div class="' + cls + '" id="' + id + '">' + CFG.emoji + '</div>'; };
       el.parentNode.replaceChild(img, el);
     }
@@ -1740,14 +1768,30 @@
     function buildGallery() {
       if (CFG.photos && CFG.photos.length) {
         var sl = document.getElementById("gal-slider"); sl.innerHTML = "";
-        CFG.photos.forEach(function (url, i) {
-          var slide = document.createElement("div"); slide.className = "gal-slide";
-          var img = document.createElement("img"); img.src = url;
+        CFG.photos.forEach(function (item, i) {
+          var url = typeof item === "string" ? item : item.url;
+          var caption = typeof item === "object" ? item.caption : ("Memory " + (i + 1));
+          var slide = document.createElement("div"); 
+          slide.className = "gal-slide";
+          
+          var img = document.createElement("img"); 
+          img.src = url;
+          img.alt = caption;
+          img.loading = "lazy";
           img.onerror = function () {
             var ph = document.createElement("div"); ph.className = "photo-ph";
-            ph.innerHTML = "🌹<p>Memory " + (i + 1) + "</p>"; this.parentNode.replaceChild(ph, this);
+            ph.innerHTML = "🌹<p>" + caption + "</p>"; 
+            this.parentNode.replaceChild(ph, this);
           };
-          slide.appendChild(img); sl.appendChild(slide);
+          slide.appendChild(img);
+
+          if (caption) {
+            var cap = document.createElement("div");
+            cap.className = "gal-caption";
+            cap.textContent = caption;
+            slide.appendChild(cap);
+          }
+          sl.appendChild(slide);
         });
       }
       var slider = document.getElementById("gal-slider");
