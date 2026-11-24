@@ -2073,8 +2073,13 @@
       profilePic: "profile.jpg",      // ← photo URL
       emoji: "🌸",                    // ← placeholder emoji
       birthday: "2005-11-28",         // ← YYYY-MM-DD
-      photos: [
+      diaryPhotos: [
         { url: "gallery/g1.jpg",  caption: "Gorgeous as always ✨" },
+        { url: "gallery/g2.jpg",  caption: "That smile says it all 💖" },
+        { url: "gallery/g3.jpg",  caption: "Pure elegance 🌸" },
+        { url: "gallery/g4.jpg",  caption: "My favourite person 🥺❤️" }
+      ],
+      photos: [
         { url: "gallery/g2.jpg",  caption: "That smile says it all 💖" },
         { url: "gallery/g3.jpg",  caption: "Pure elegance 🌸" },
         { url: "gallery/g4.jpg",  caption: "My favourite person 🥺❤️" },
@@ -2513,7 +2518,8 @@
       var ord = function (n) { var t = ["th", "st", "nd", "rd"], v = n % 100; return n + (t[(v - 20) % 10] || t[v] || t[0]); };
       var dateTxt = dob.toLocaleDateString("en-GB", { day: "numeric", month: "long" });
       var stamp = dob.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/\//g, " · ");
-      var photos = CFG.photos.map(function (p) { return typeof p === "object" ? p.url : p; });
+      var diaryArr = CFG.diaryPhotos || CFG.photos;
+      var photos = diaryArr.map(function (p) { return typeof p === "object" ? p.url : p; });
 
       function ph(i) {
         return '<div class="dv-ph" style="--dv-img:url(\'' + photos[i % photos.length] + '\')"></div>';
