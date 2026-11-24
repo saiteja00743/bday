@@ -1097,13 +1097,13 @@
 
     .gal-slider {
       display: flex;
-      transition: transform .4s var(--ease);
-      /* width set dynamically by buildGallery */
+      flex-wrap: nowrap;
+      transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+      /* width & slide widths set by applyGalWidths() in JS */
     }
 
     .gal-slide {
-      flex: 0 0 100%;
-      width: 100%;
+      flex: 0 0 auto;
       border-radius: 20px;
       overflow: hidden;
       border: 1px solid rgba(200, 16, 46, .25);
@@ -2409,15 +2409,17 @@
     }
 
     /* ══════════════════════════════════════
-       GALLERY
+       GALLERY — pixel-based reliable slider
     ══════════════════════════════════════ */
+    var galSlideW = 0; /* slide width in px, set by applyGalWidths() */
+
     function buildGallery() {
       var sl = document.getElementById("gal-slider");
       if (!sl) return;
       sl.innerHTML = "";
       var photos = (CFG.photos && CFG.photos.length) ? CFG.photos : [
-        {url:"", caption:"Photo 1 — Add your memory"},
-        {url:"", caption:"Photo 2 — A moment to remember"}
+        {url:"gallery/g2.jpg", caption:"That smile says it all 💖"},
+        {url:"gallery/g3.jpg", caption:"Pure elegance 🌸"}
       ];
       photos.forEach(function (item, i) {
         var url = typeof item === "string" ? item : item.url;
@@ -2425,23 +2427,18 @@
         var slide = document.createElement("div");
         slide.className = "gal-slide";
 
-        if (url) {
-          var img = document.createElement("img");
-          img.src = url;
-          img.alt = caption;
-          img.loading = i < 3 ? "eager" : "lazy";
-          img.decoding = "async";
-          img.onerror = function () {
-            var ph = document.createElement("div"); ph.className = "photo-ph";
-            ph.innerHTML = "🌹<p>" + caption + "</p>";
-            this.parentNode.replaceChild(ph, this);
-          };
-          slide.appendChild(img);
-        } else {
+        var img = document.createElement("img");
+        img.src = url;
+        img.alt = caption;
+        img.loading = i < 4 ? "eager" : "lazy";
+        img.decoding = "async";
+        img.onerror = function () {
+          this.style.display = "none";
           var ph = document.createElement("div"); ph.className = "photo-ph";
           ph.innerHTML = "🌹<p>" + caption + "</p>";
-          slide.appendChild(ph);
-        }
+          slide.insertBefore(ph, this);
+        };
+        slide.appendChild(img);
 
         if (caption) {
           var cap = document.createElement("div");
@@ -2453,29 +2450,49 @@
       });
 
       gCount = sl.children.length;
-      /* KEY FIX: set slider total width so slides lay out side-by-side */
-      sl.style.width = (gCount * 100) + "%";
-      /* each slide must be 1/N of slider = viewport width */
-      var slideEls = sl.querySelectorAll(".gal-slide");
-      slideEls.forEach(function(s) { s.style.width = (100 / gCount) + "%"; });
 
-      var wrap = document.getElementById("gal-dots"); if (!wrap) return;
-      wrap.innerHTML = "";
-      for (var i = 0; i < gCount; i++) {
-        var d = document.createElement("div");
-        d.className = "g-dot" + (i === 0 ? " active" : "");
-        (function (idx) { d.onclick = function () { goSlide(idx); }; })(i);
-        wrap.appendChild(d);
+      /* build dots */
+      var dotsWrap = document.getElementById("gal-dots");
+      if (dotsWrap) {
+        dotsWrap.innerHTML = "";
+        for (var i = 0; i < gCount; i++) {
+          var d = document.createElement("div");
+          d.className = "g-dot" + (i === 0 ? " active" : "");
+          (function (idx) { d.onclick = function () { galAutoStop(); goSlide(idx); galAutoStart(); }; })(i);
+          dotsWrap.appendChild(d);
+        }
       }
-      goSlide(0);
+
+      /* Apply pixel widths — called here AND on resize AND on screen enter */
+      applyGalWidths();
+    }
+
+    function applyGalWidths() {
+      var gw = document.getElementById("gal-wrap");
+      var sl = document.getElementById("gal-slider");
+      if (!gw || !sl || gCount === 0) return;
+      galSlideW = gw.offsetWidth;
+      if (galSlideW === 0) return; /* screen not visible yet — toMemories will retry */
+      sl.style.transition = "none";
+      sl.style.width = (gCount * galSlideW) + "px";
+      var kids = sl.children;
+      for (var i = 0; i < kids.length; i++) { kids[i].style.width = galSlideW + "px"; }
+      /* snap to current slide instantly */
+      sl.style.transform = "translateX(-" + (gIdx * galSlideW) + "px)";
+      /* restore transition on next frame */
+      requestAnimationFrame(function() {
+        if (sl) sl.style.transition = "";
+      });
     }
 
     function goSlide(i) {
       if (gCount === 0) return;
-      gIdx = ((i % gCount) + gCount) % gCount;   /* loop around */
+      gIdx = ((i % gCount) + gCount) % gCount;
       var sl = document.getElementById("gal-slider");
-      /* slider width = gCount*100%; each slide = (100/gCount)%; so offset = gIdx*(100/gCount)% of slider */
-      if (sl) sl.style.transform = "translateX(-" + (gIdx * (100 / gCount)) + "%)";
+      if (sl) {
+        sl.style.transition = "transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)";
+        sl.style.transform = "translateX(-" + (gIdx * galSlideW) + "px)";
+      }
       document.querySelectorAll(".g-dot").forEach(function (d, j) { d.classList.toggle("active", j === gIdx); });
     }
 
@@ -2491,56 +2508,67 @@
     function initSwipe() {
       var gw = document.getElementById("gal-wrap"); if (!gw) return;
       var sl = document.getElementById("gal-slider"); if (!sl) return;
-      var startX = 0, startY = 0, isDragging = false;
+      var startX = 0, startY = 0, startT = 0, isDragging = false;
+      var THRESHOLD = 40; /* px to register swipe */
 
+      /* ── Touch ── */
       gw.addEventListener("touchstart", function(e) {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
+        startT = Date.now();
         isDragging = true;
-        galAutoStop(); /* pause auto on touch */
+        galAutoStop();
+        sl.style.transition = "none";
       }, { passive: true });
 
       gw.addEventListener("touchmove", function(e) {
         if (!isDragging) return;
         var dx = e.touches[0].clientX - startX;
         var dy = e.touches[0].clientY - startY;
-        /* only hijack if horizontal swipe dominates */
         if (Math.abs(dx) > Math.abs(dy)) {
           e.preventDefault();
-          sl.style.transition = "none";
-          /* base offset in % of slider (gCount*100%); slide width = 100/gCount% of slider */
-          var basePct = gIdx * (100 / gCount);
-          var dragPct = (dx / (gw.offsetWidth || 1)) * (100 / gCount);
-          sl.style.transform = "translateX(" + (-basePct + dragPct) + "%)";
+          sl.style.transform = "translateX(" + (-(gIdx * galSlideW) + dx) + "px)";
         }
       }, { passive: false });
 
       gw.addEventListener("touchend", function(e) {
-        if (!isDragging) return; isDragging = false;
-        sl.style.transition = "";
+        if (!isDragging) return;
+        isDragging = false;
         var dx = e.changedTouches[0].clientX - startX;
-        if (Math.abs(dx) > 40) { goSlide(dx > 0 ? gIdx - 1 : gIdx + 1); }
-        else { goSlide(gIdx); }
+        var dt = Date.now() - startT;
+        /* fast flick OR dragged enough */
+        if (Math.abs(dx) > THRESHOLD || (dt < 300 && Math.abs(dx) > 15)) {
+          goSlide(dx > 0 ? gIdx - 1 : gIdx + 1);
+        } else {
+          goSlide(gIdx); /* snap back */
+        }
         galAutoStart();
       }, { passive: true });
 
-      gw.addEventListener("mousedown", function(e) { startX = e.clientX; isDragging = true; galAutoStop(); });
+      /* ── Mouse (desktop) ── */
+      gw.addEventListener("mousedown", function(e) {
+        startX = e.clientX; startT = Date.now();
+        isDragging = true; galAutoStop();
+        sl.style.transition = "none";
+        e.preventDefault();
+      });
       gw.addEventListener("mousemove", function(e) {
         if (!isDragging) return;
-        sl.style.transition = "none";
-        var basePct = gIdx * (100 / gCount);
-        var dragPct = ((e.clientX - startX) / (gw.offsetWidth || 1)) * (100 / gCount);
-        sl.style.transform = "translateX(" + (-basePct + dragPct) + "%)";
+        sl.style.transform = "translateX(" + (-(gIdx * galSlideW) + (e.clientX - startX)) + "px)";
       });
-      gw.addEventListener("mouseup", function(e) {
-        if (!isDragging) return; isDragging = false;
-        sl.style.transition = "";
+      window.addEventListener("mouseup", function(e) {
+        if (!isDragging) return;
+        isDragging = false;
         var dx = e.clientX - startX;
-        if (Math.abs(dx) > 40) goSlide(dx > 0 ? gIdx - 1 : gIdx + 1);
+        if (Math.abs(dx) > THRESHOLD) goSlide(dx > 0 ? gIdx - 1 : gIdx + 1);
         else goSlide(gIdx);
         galAutoStart();
       });
-      gw.addEventListener("mouseleave", function() { if(isDragging){ isDragging=false; sl.style.transition=""; goSlide(gIdx); galAutoStart(); } });
+
+      /* resize: recalculate pixel widths */
+      window.addEventListener("resize", function() {
+        applyGalWidths();
+      });
     }
 
     /* gallery stubs for nav compatibility */
@@ -2613,7 +2641,18 @@
       }, 5500);
     }
 
-    function toMemories() { sfx("whoosh"); showScreen("s-bday"); startHearts(); goSlide(0); galAutoStart(); }
+    function toMemories() {
+      sfx("whoosh");
+      showScreen("s-bday");
+      startHearts();
+      /* recalculate pixel widths now that screen is visible */
+      requestAnimationFrame(function() {
+        applyGalWidths();
+        gIdx = 0;
+        goSlide(0);
+        galAutoStart();
+      });
+    }
 
     function toDiary() {
       galAutoStop();
@@ -3008,7 +3047,7 @@
       /* resume main music at 25% vol */
       var au = document.getElementById("bg-music");
       if (au && musicOn && au.paused) { au.volume = 0.25; au.play().catch(function(){}); }
-      ckPetals(); sfx("celebrate"); confetti(); startHearts(); showScreen("s-bday");
+      sfx("celebrate"); startHearts(); showScreen("s-bday");
     }
     function ckAgain() { ckStopSong(); ckInit(); }
 
@@ -3106,7 +3145,7 @@
     function startHearts() {
       if (heartTmr) return;
       var wrap = document.getElementById("fhearts");
-      var emojis = ["❤️", "🌹", "💕", "✨", "💖", "🌸", "💗"];
+      var emojis = ["❤️", "💕", "✨", "💖", "💗", "🌟", "💝"];
       heartTmr = setInterval(function () {
         var h = document.createElement("div"); h.className = "float-heart";
         h.textContent = emojis[Math.floor(Math.random() * emojis.length)];
