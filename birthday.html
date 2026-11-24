@@ -1990,12 +1990,12 @@
       gw.addEventListener("touchstart", function (e) { gSX = e.touches[0].clientX; gDrag = true; }, { passive: true });
       gw.addEventListener("touchend", function (e) {
         if (!gDrag) return; var d = gSX - e.changedTouches[0].clientX;
-        if (Math.abs(d) > 40) goSlide(d > 0 ? gIdx + 1 : gIdx - 1); gDrag = false;
+        if (Math.abs(d) > 40) { sfx("sparkle"); goSlide(d > 0 ? gIdx + 1 : gIdx - 1); } gDrag = false;
       });
       gw.addEventListener("mousedown", function (e) { gSX = e.clientX; gDrag = true; });
       gw.addEventListener("mouseup", function (e) {
         if (!gDrag) return; var d = gSX - e.clientX;
-        if (Math.abs(d) > 40) goSlide(d > 0 ? gIdx + 1 : gIdx - 1); gDrag = false;
+        if (Math.abs(d) > 40) { sfx("sparkle"); goSlide(d > 0 ? gIdx + 1 : gIdx - 1); } gDrag = false;
       });
     }
 
@@ -2009,14 +2009,16 @@
     }
 
     function toPasscode() {
+      sfx("heart");
       var btn = document.getElementById("lock-btn");
       if (btn) { btn.style.transform = "scale(.95)"; setTimeout(function () { btn.style.transform = ""; }, 200); }
-      setTimeout(function () { showScreen("s-pass"); }, 300);
+      setTimeout(function () { showScreen("s-pass"); sfx("whoosh"); }, 300);
     }
 
-    function toLock() { resetCode(); showScreen("s-lock"); }
+    function toLock() { sfx("whoosh"); resetCode(); showScreen("s-lock"); }
 
     function toLoading() {
+      sfx("whoosh");
       // 🎵 Start music on unlock
       var au = document.getElementById("bg-music");
       var btn = document.getElementById("music-btn");
@@ -2035,17 +2037,18 @@
         var pct = Math.min(100, (ts - start) / 40);
         bar.style.width = pct + "%";
         if (pct < 100) requestAnimationFrame(step);
-        else setTimeout(function () { showScreen("s-special"); }, 300);
+        else setTimeout(function () { sfx("ding"); showScreen("s-special"); }, 300);
       }
       setTimeout(function () { requestAnimationFrame(step); }, 100);
     }
 
     function toBirthday() {
+      sfx("whoosh");
       showScreen("s-count");
-      setTimeout(function () { toMemories(); }, 5500);
+      setTimeout(function () { sfx("fanfare"); toMemories(); }, 5500);
     }
 
-    function toMemories() { showScreen("s-bday"); startHearts(); }
+    function toMemories() { sfx("whoosh"); showScreen("s-bday"); startHearts(); }
 
     function toDiary() {
       sfx("gift");
@@ -2053,9 +2056,10 @@
       buildDiary();
     }
 
-    function toLetter() { sfx("gift"); showScreen("s-letter"); }
+    function toLetter() { sfx("whoosh"); showScreen("s-letter"); }
 
     function openLetter() {
+      sfx("letter");
       var c = document.querySelector(".sealed-card");
       if (c) { c.style.transform = "scale(.96)"; setTimeout(function () { c.style.transform = ""; }, 300); }
       setTimeout(function () { document.getElementById("letter-modal").classList.add("open"); }, 300);
@@ -2063,10 +2067,10 @@
 
     function closeLetter() { document.getElementById("letter-modal").classList.remove("open"); }
 
-    function celebrate() { closeLetter(); confetti(); showScreen("s-bday"); startHearts(); }
+    function celebrate() { sfx("celebrate"); closeLetter(); confetti(); showScreen("s-bday"); startHearts(); }
 
     function restartAll() {
-      closeLetter(); resetCode(); stopHearts();
+      sfx("whoosh"); closeLetter(); resetCode(); stopHearts();
       setTimeout(function () { showScreen("s-lock"); }, 400);
     }
 
@@ -2075,6 +2079,7 @@
     ══════════════════════════════════════ */
     function kp(d) {
       if (code.length >= 4) return;
+      sfx("key");
       code += d;
       refreshDisplay();
       if (code.length === 4) setTimeout(checkCode, 400);
@@ -2082,6 +2087,7 @@
 
     function kb() {
       if (!code.length) return;
+      sfx("delete");
       code = code.slice(0, -1);
       refreshDisplay();
     }
@@ -2131,6 +2137,7 @@
         }, 800);
       } else {
         // ❌ Wrong
+        sfx("error");
         if (pd) { pd.classList.add("shake"); pd.style.borderColor = "rgba(255,60,60,.5)"; }
         var e = document.getElementById("err-msg"); if (e) e.classList.add("show");
         setTimeout(function () {
@@ -2287,7 +2294,9 @@
       var cur = 0;
       leaves.forEach(function(l,i){ l.style.zIndex = n-i; });
 
+      var diaryReady = false;
       function update() {
+        if (diaryReady) sfx("page");
         leaves.forEach(function(l,i){
           var flipped = i < cur;
           var was = l.classList.contains("flipped");
@@ -2313,7 +2322,7 @@
       document.getElementById("d-next").onclick = function(){ if(cur < n){ cur++; update(); } };
       document.getElementById("d-prev").onclick = function(){ if(cur > 0){ cur--; update(); } };
       update();
-
+      diaryReady = true;
       buildStarsFor("st-diary");
     }
 
@@ -2328,25 +2337,163 @@
       }
     }
 
+    /* ══════════════════════════════════════
+       🔊 SFX ENGINE — Web Audio API
+    ══════════════════════════════════════ */
+    var _actx = null;
+    function getCtx() {
+      if (!_actx) _actx = new (window.AudioContext || window.webkitAudioContext)();
+      if (_actx.state === "suspended") _actx.resume();
+      return _actx;
+    }
+
+    /* helper: play an oscillator note */
+    function _osc(freq, type, vol, start, dur, freqEnd) {
+      try {
+        var ctx = getCtx(), t = ctx.currentTime + (start || 0);
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = type || "sine"; o.frequency.value = freq;
+        if (freqEnd) o.frequency.exponentialRampToValueAtTime(freqEnd, t + dur);
+        g.gain.setValueAtTime(vol || .12, t);
+        g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t + dur + .01);
+      } catch(e){}
+    }
+
+    /* helper: white-noise burst (page rustle, whoosh) */
+    function _noise(vol, start, dur, freq, q) {
+      try {
+        var ctx = getCtx(), t = ctx.currentTime + (start || 0);
+        var buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+        var d = buf.getChannelData(0);
+        for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+        var src = ctx.createBufferSource();
+        src.buffer = buf;
+        var flt = ctx.createBiquadFilter();
+        flt.type = "bandpass"; flt.frequency.value = freq || 1200; flt.Q.value = q || 1.2;
+        var g = ctx.createGain();
+        g.gain.setValueAtTime(vol || .18, t);
+        g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        src.connect(flt); flt.connect(g); g.connect(ctx.destination);
+        src.start(t); src.stop(t + dur + .01);
+      } catch(e){}
+    }
+
     function sfx(type) {
       try {
-        var ctx = new (window.AudioContext || window.webkitAudioContext)();
-        var o = ctx.createOscillator(); var g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        if (type === "unlock") {
-          o.frequency.setValueAtTime(440, ctx.currentTime);
-          o.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + .15);
-          g.gain.setValueAtTime(.15, ctx.currentTime);
-          g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .4);
-          o.start(ctx.currentTime); o.stop(ctx.currentTime + .4);
-        } else {
-          o.frequency.setValueAtTime(600, ctx.currentTime);
-          o.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + .1);
-          g.gain.setValueAtTime(.12, ctx.currentTime);
-          g.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .5);
-          o.start(ctx.currentTime); o.stop(ctx.currentTime + .5);
+        var ctx = getCtx();
+        switch(type) {
+
+          /* 🔑 Soft keypad click */
+          case "key":
+            _osc(600, "sine", .06, 0, .05);
+            _noise(.04, 0, .04, 2000, 3);
+            break;
+
+          /* ⌫ Backspace delete */
+          case "delete":
+            _osc(300, "sine", .07, 0, .08, 200);
+            break;
+
+          /* ✅ Correct passcode — ascending triumphant chime */
+          case "unlock":
+            _osc(523, "sine", .18, 0,   .12);   // C5
+            _osc(659, "sine", .18, .1,  .12);   // E5
+            _osc(784, "sine", .18, .2,  .15);   // G5
+            _osc(1047,"sine", .22, .32, .3);    // C6
+            _noise(.06, .3, .2, 1800, 2);
+            break;
+
+          /* ❌ Wrong passcode — descending buzz */
+          case "error":
+            _osc(300, "sawtooth", .15, 0,   .1, 200);
+            _osc(220, "sawtooth", .15, .12, .1, 180);
+            _osc(180, "sawtooth", .12, .24, .15, 150);
+            break;
+
+          /* 📱 Screen whoosh transition */
+          case "whoosh":
+            _noise(.12, 0, .25, 800, .8);
+            _osc(400, "sine", .05, 0, .2, 200);
+            break;
+
+          /* 📖 Diary page turn — paper rustle */
+          case "page":
+            _noise(.15, 0,   .08, 1800, 2);
+            _noise(.10, .06, .10, 2200, 1.5);
+            _noise(.06, .14, .08, 1500, 2);
+            break;
+
+          /* 🎁 Gift / magic sparkle */
+          case "gift":
+            _osc(880,  "sine", .12, 0,   .1);
+            _osc(1047, "sine", .12, .08, .1);
+            _osc(1319, "sine", .14, .16, .12);
+            _osc(1568, "sine", .14, .26, .15);
+            _osc(2093, "sine", .10, .38, .2);
+            _noise(.04, .2, .3, 3000, 2);
+            break;
+
+          /* 💌 Letter seal pop / envelope open */
+          case "letter":
+            _noise(.20, 0, .06, 600, 1.5);
+            _osc(440, "sine", .10, .05, .15, 660);
+            _osc(880, "sine", .08, .18, .2);
+            _noise(.05, .15, .15, 2000, 2);
+            break;
+
+          /* 🎉 Celebrate — fireworks burst */
+          case "celebrate":
+            /* 3 quick pops */
+            _noise(.25, 0,   .07, 400, .6);
+            _noise(.20, .15, .07, 500, .6);
+            _noise(.22, .28, .07, 350, .6);
+            /* ascending sparkle melody */
+            _osc(523,  "sine", .15, .0,  .1);
+            _osc(659,  "sine", .15, .08, .1);
+            _osc(784,  "sine", .15, .16, .1);
+            _osc(1047, "sine", .18, .24, .15);
+            _osc(1319, "sine", .18, .32, .15);
+            _osc(1568, "sine", .20, .40, .2);
+            /* reverb tail shimmer */
+            _noise(.08, .35, .4, 2500, 1.5);
+            break;
+
+          /* 🎂 Birthday fanfare — short jingle */
+          case "fanfare":
+            _osc(523,  "triangle", .15, 0,    .1);  // C
+            _osc(659,  "triangle", .15, .1,   .1);  // E
+            _osc(784,  "triangle", .15, .2,   .1);  // G
+            _osc(1047, "triangle", .18, .3,   .2);  // C
+            _osc(784,  "triangle", .12, .5,   .08); // G
+            _osc(1047, "triangle", .20, .6,   .35); // C long
+            break;
+
+          /* 💫 Loading complete — soft ding */
+          case "ding":
+            _osc(1047, "sine", .18, 0, .5, 1319);
+            _noise(.03, 0, .08, 3000, 3);
+            break;
+
+          /* ❤️ Heart / lock screen tap */
+          case "heart":
+            _osc(220, "sine", .10, 0,   .07);
+            _osc(180, "sine", .08, .09, .07);
+            break;
+
+          /* 🌟 Star / sparkle (generic accent) */
+          case "sparkle":
+            _osc(1200, "sine", .08, 0,   .06);
+            _osc(1600, "sine", .08, .05, .06);
+            _osc(2000, "sine", .06, .1,  .08);
+            break;
+
+          /* default fallback */
+          default:
+            _osc(600, "sine", .10, 0, .15, 900);
         }
-      } catch (e) { }
+      } catch(e) {}
     }
 
     /* Keyboard support (desktop) */
