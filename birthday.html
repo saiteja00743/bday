@@ -1182,225 +1182,185 @@
       }
     }
 
-    /* ── SCREEN 7: LETTER ── */
+    /* ── SCREEN 7: LETTER (SCROLL) ── */
+    #s-letter {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch
+    }
     #s-letter .content {
       width: 100%;
-      max-width: 400px;
-      padding: 40px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center
-    }
-
-    .letter-h {
-      font-family: var(--fd);
-      font-size: clamp(22px, 6vw, 28px);
-      letter-spacing: .08em;
-      color: #fff;
-      width: 100%;
-      margin-bottom: 8px;
-      text-shadow: 0 2px 20px rgba(200, 16, 46, .4)
-    }
-
-    .letter-sub {
-      font-family: var(--fs);
-      font-style: italic;
-      font-size: 13px;
-      color: rgba(255, 255, 255, .4);
-      margin-bottom: 28px
-    }
-
-    .sealed-card {
-      width: 100%;
-      background: rgba(5, 0, 3, .7);
-      border: 1px solid rgba(200, 16, 46, .3);
-      border-radius: 20px;
-      padding: 40px 20px;
+      max-width: 440px;
+      padding: 44px 20px 80px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      touch-action: manipulation;
-      box-shadow: 0 0 40px rgba(200, 16, 46, .15), inset 0 0 30px rgba(200, 16, 46, .05);
-      transition: all .3s;
-      margin-bottom: 24px
+      gap: 18px;
+      min-height: 100%
     }
 
-    .sealed-card:active {
-      box-shadow: 0 0 60px rgba(200, 16, 46, .4);
-      border-color: rgba(200, 16, 46, .8)
+    /* hint above scroll */
+    .scr-hint {
+      text-align: center;
+      font: 400 1.25rem 'Kalam', cursive;
+      color: #e3b955;
+      transition: opacity .5s, transform .5s;
+      animation: scr-glow 2.4s ease-in-out infinite
     }
+    .scr-hint.gone { opacity: 0; transform: translateY(-10px); pointer-events: none }
+    @keyframes scr-glow { 50% { text-shadow: 0 0 14px #e3b955aa } }
 
-    .heart-icon {
-      font-size: 48px;
-      animation: hbeat 1.4s ease-in-out infinite;
-      filter: drop-shadow(0 0 15px rgba(200, 16, 46, .8))
+    /* scroll container */
+    .scr-wrap {
+      position: relative;
+      width: min(380px, calc(100vw - 48px));
+      cursor: pointer
     }
+    .scr-wrap:not(.untie) { animation: scr-float 3s ease-in-out infinite }
+    @keyframes scr-float { 50% { transform: translateY(-5px) } }
 
-    .tap-lbl {
-      font-family: var(--fd);
-      font-size: 11px;
-      letter-spacing: .3em;
-      color: rgba(255, 255, 255, .4)
+    /* rollers */
+    .scr-roll {
+      position: relative;
+      height: 32px;
+      border-radius: 16px;
+      z-index: 3;
+      background: linear-gradient(#a9712a, #e9c383 25%, #fff0c8 48%, #e2b569 72%, #9c6422);
+      box-shadow: 0 8px 12px #0007
     }
-
-    .letter-dots {
-      display: flex;
-      gap: 8px;
-      align-items: center
-    }
-
-    .l-dot {
-      width: 6px;
-      height: 6px;
+    .scr-roll::before, .scr-roll::after {
+      content: "";
+      position: absolute;
+      top: -2px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      background: rgba(200, 16, 46, .3)
+      background: radial-gradient(circle, #7a4a18 0 14%, #e7c07a 15% 32%, #a2702d 33% 48%, #ecd096 49% 66%, #9a6827 67%)
     }
+    .scr-roll::before { left: -12px }
+    .scr-roll::after  { right: -12px }
+    .scr-roll.bot { margin-top: -10px; transition: margin-top .6s }
+    .scr-wrap.open .scr-roll.bot { margin-top: 0 }
 
-    .l-dot.active {
-      background: var(--cr)
+    /* paper */
+    .scr-paper {
+      position: relative;
+      width: 92%;
+      margin: 0 auto;
+      height: 0;
+      overflow: hidden;
+      transition: height 1.8s cubic-bezier(.5,.1,.2,1)
     }
-
-    .l-dot-h {
-      font-size: 12px;
-      filter: drop-shadow(0 0 6px rgba(200, 16, 46, .8))
-    }
-
-    /* ── MODAL ── */
-    .modal-overlay {
-      position: fixed;
+    .scr-paper::before {
+      content: "";
+      position: absolute;
       inset: 0;
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: rgba(0, 0, 0, .7);
-      backdrop-filter: blur(8px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .4s
+      z-index: 0;
+      box-shadow: inset 0 0 46px #8a5a2aaa;
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .28 0 0 0 0 .1 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 25% 12%, #fbf0cf, transparent 55%),
+        radial-gradient(circle at 80% 85%, #d3ad6c88, transparent 55%),
+        #efdcae
     }
-
-    .modal-overlay.open {
-      opacity: 1;
-      pointer-events: all
+    .scr-in {
+      position: relative;
+      z-index: 1;
+      padding: 32px 11% 32px;
+      color: #3a2412;
+      font: 400 1.08rem/1.52 'Kalam', cursive
     }
-
-    .modal-box {
-      width: 100%;
-      max-width: 380px;
-      background: linear-gradient(180deg, #150005, #0d0005);
-      border: 1px solid rgba(200, 16, 46, .5);
-      border-radius: 24px;
-      padding: 28px 24px;
-      box-shadow: 0 0 60px rgba(200, 16, 46, .4), 0 20px 60px rgba(0, 0, 0, .8);
-      transform: scale(.85) translateY(30px);
-      transition: transform .4s var(--spring);
-      max-height: 85vh;
-      overflow-y: auto
+    .scr-in h2 {
+      font: 400 1.55rem/1.1 'Rozha One', serif;
+      color: #b3261e;
+      text-align: center;
+      margin-bottom: 4px
     }
-
-    .modal-overlay.open .modal-box {
-      transform: scale(1) translateY(0)
+    .scr-divider {
+      display: block;
+      width: 46%;
+      margin: 8px auto 14px;
+      color: #9a6b2a
     }
-
-    .modal-hdr {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 6px
-    }
-
-    .modal-title {
-      font-family: var(--fd);
-      font-size: 16px;
-      letter-spacing: .1em;
-      color: #fff
-    }
-
-    .modal-close {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: rgba(200, 16, 46, .2);
-      border: 1px solid rgba(200, 16, 46, .4);
-      color: #fff;
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      touch-action: manipulation
-    }
-
-    .modal-from {
-      font-family: var(--fs);
-      font-style: italic;
-      font-size: 12px;
-      color: rgba(200, 16, 46, .6);
-      margin-bottom: 20px
-    }
-
-    .modal-letter {
-      background: rgba(5, 0, 3, .8);
-      border-radius: 14px;
-      padding: 20px 18px;
-      margin-bottom: 24px;
-      border: 1px solid rgba(200, 16, 46, .1)
-    }
-
-    .modal-letter p {
-      font-family: var(--fs);
-      font-size: clamp(14px, 4vw, 16px);
-      color: rgba(255, 255, 255, .9);
-      line-height: 1.8;
-      margin-bottom: 14px
-    }
-
-    .modal-letter p:last-child {
+    .scr-in p { margin-bottom: .9em }
+    .scr-in p.scr-sig {
+      text-align: center;
+      color: #6b1a1a;
+      font-weight: 700;
       margin-bottom: 0
     }
+    .scr-in em { color: #b3261e; font-weight: 700; font-style: normal }
+    .scr-c { opacity: 0; transition: opacity .15s }
+    .scr-c.on { opacity: 1 }
 
-    .modal-letter strong {
-      color: var(--cr-s);
-      font-style: italic
+    /* ribbon & bow */
+    .scr-ties {
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 54px;
+      z-index: 6;
+      pointer-events: none
     }
+    .scr-band {
+      position: absolute;
+      left: 50%; margin-left: -14px;
+      top: -4px;
+      width: 28px; height: 62px;
+      transform-origin: top;
+      background: linear-gradient(90deg, #4f0c10, #a3242a 30%, #d04450 50%, #a3242a 70%, #4f0c10);
+      box-shadow: inset 3px 0 0 -1px #e3b95599, inset -3px 0 0 -1px #e3b95599, 0 4px 8px #0006
+    }
+    .scr-bow {
+      position: absolute;
+      left: 50%; top: 27px;
+      width: 104px;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 4px 4px #0007)
+    }
+    .scr-wrap.untie .scr-bow  { animation: scr-untie 1s ease-in forwards }
+    .scr-wrap.untie .scr-band { animation: scr-slip .9s .7s ease-in forwards }
+    @keyframes scr-untie {
+      0%   { transform: translate(-50%,-50%) }
+      25%  { transform: translate(-50%,-50%) rotate(-8deg) scale(1.1) }
+      55%  { transform: translate(-50%,-44%) rotate(8deg) scale(.7) }
+      100% { transform: translate(-50%,40px) rotate(40deg) scale(.1); opacity: 0 }
+    }
+    @keyframes scr-slip { to { transform: translateY(240px) rotate(14deg); opacity: 0 } }
 
-    .modal-actions {
+    /* buttons */
+    .scr-btns {
       display: flex;
-      gap: 12px
+      gap: 10px;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: .6s
     }
-
-    .btn-celebrate {
-      flex: 1;
-      background: var(--cr);
-      border: none;
-      border-radius: 50px;
-      padding: 14px;
-      font-family: var(--fd);
-      font-size: 12px;
-      letter-spacing: .2em;
-      color: #fff;
+    .scr-btns.show { opacity: 1; transform: none; pointer-events: auto }
+    .scr-btn {
+      font: 700 1rem 'Kalam', cursive;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border-radius: 99px;
+      padding: 10px 24px;
       cursor: pointer;
       touch-action: manipulation;
-      box-shadow: 0 0 20px rgba(200, 16, 46, .4)
+      border: 2px solid #e3b955
     }
+    .scr-btn-go { background: #e3b955; color: #4a1010 }
+    .scr-btn-re { background: transparent; color: #e3b955 }
 
-    .btn-restart {
-      flex: 1;
-      background: transparent;
-      border: 1px solid rgba(200, 16, 46, .5);
-      border-radius: 50px;
-      padding: 14px;
-      font-family: var(--fd);
-      font-size: 12px;
-      letter-spacing: .2em;
-      color: rgba(255, 255, 255, .7);
-      cursor: pointer;
-      touch-action: manipulation
+    /* petals */
+    .scr-petal {
+      position: fixed;
+      top: -24px;
+      width: 10px; height: 14px;
+      border-radius: 50% 50% 50% 0;
+      animation: scr-fall var(--d) linear forwards;
+      z-index: 50;
+      pointer-events: none
     }
+    @keyframes scr-fall { to { transform: translate(var(--x), 110vh) rotate(540deg) } }
+    @media (prefers-reduced-motion: reduce) { .scr-wrap, .scr-hint { animation: none !important } }
 
     /* Confetti */
     .conf {
@@ -2032,48 +1992,37 @@
     </div>
   </div>
 
-  <!-- ═══ SCREEN 7: LETTER REVEAL ═══ -->
+  <!-- ═══ SCREEN 7: LETTER REVEAL (SCROLL) ═══ -->
   <div class="screen" id="s-letter">
     <div class="screen-bg bg-letter"></div>
     <div class="stars-wrap" id="st-letter"></div>
     <div class="content">
-      <h2 class="letter-h">A Letter, Just For You</h2>
-      <p class="letter-sub">Tap the heart to unseal your message...</p>
-      <div class="sealed-card" onclick="openLetter()">
-        <div class="heart-icon">🤍</div>
-        <div class="tap-lbl">TAP TO OPEN</div>
-      </div>
-      <div class="letter-dots">
-        <div class="l-dot"></div>
-        <div class="l-dot-h">♥</div>
-        <div class="l-dot active"></div>
-      </div>
-    </div>
-  </div>
+      <div class="scr-hint" id="scr-hint">tap the scroll to untie the ribbon ✦</div>
 
-  <!-- ═══ MODAL: LETTER ═══ -->
-  <div class="modal-overlay" id="letter-modal">
-    <div class="modal-box">
-      <div class="modal-hdr">
-        <div class="modal-title">Just For You ✦</div>
-        <button class="modal-close" onclick="closeLetter()">✕</button>
+      <div class="scr-wrap" id="scr-wrap" role="button" tabindex="0" aria-label="Untie the ribbon and open the scroll">
+        <div class="scr-roll top"></div>
+        <div class="scr-paper" id="scr-paper"><div class="scr-in" id="scr-in"></div></div>
+        <div class="scr-roll bot"></div>
+        <div class="scr-ties">
+          <div class="scr-band"></div>
+          <svg class="scr-bow" viewBox="0 0 120 100" aria-hidden="true">
+            <defs>
+              <g id="scr-half">
+                <path d="M60 40C30 4 4 24 22 48C32 60 50 50 60 40Z" fill="#b3261e" stroke="#e3b955" stroke-width="1.2"/>
+                <path d="M58 40C40 20 22 30 28 44C34 52 48 48 58 40Z" fill="#8f1d22"/>
+                <path d="M56 48L36 94L50 86L56 98L64 54Z" fill="#a3242a" stroke="#e3b955" stroke-width="1"/>
+              </g>
+            </defs>
+            <use href="#scr-half"/>
+            <use href="#scr-half" transform="translate(120 0) scale(-1 1)"/>
+            <circle cx="60" cy="42" r="10" fill="#8f1d22" stroke="#e3b955" stroke-width="1.5"/>
+          </svg>
+        </div>
       </div>
-      <div class="modal-from">From my heart to yours</div>
-      <div class="modal-letter">
-        <!-- REPLACE: your personal letter -->
-        <p>Happy Birthday, Varshini ❤️</p>
-        <p>You are the most beautiful part of my life, and I'm so incredibly lucky to have you. Your smile has the power
-          to make everything better — it's honestly one of the most beautiful things in this world.</p>
-        <p>I want you to know that you are <strong>irreplaceable</strong>. You matter more than words can say. Every
-          single day you inspire me, make me laugh, and remind me what truly matters in life.</p>
-        <p>On your special day, I want you to feel every ounce of love I have for you. You deserve the world — nothing
-          but pure joy, warmth, and magic, just like you bring to everyone around you. 🌹</p>
-        <p><strong>Happy Birthday, my wonderful, beautiful best friend.</strong><br>Always yours. Always here. Always
-          grateful. ♥</p>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-celebrate" onclick="celebrate()">CELEBRATE 🎉</button>
-        <button class="btn-restart" onclick="restartAll()">RESTART ↺</button>
+
+      <div class="scr-btns" id="scr-btns">
+        <button class="scr-btn scr-btn-go" id="scr-celebrate" onclick="scrCelebrate()">Celebrate ✿</button>
+        <button class="scr-btn scr-btn-re" id="scr-roll-up" onclick="scrRollUp()">Roll up ↺</button>
       </div>
     </div>
   </div>
@@ -2376,21 +2325,156 @@
       buildDiary();
     }
 
-    function toLetter() { sfx("whoosh"); showScreen("s-letter"); }
-
-    function openLetter() {
-      sfx("letter");
-      var c = document.querySelector(".sealed-card");
-      if (c) { c.style.transform = "scale(.96)"; setTimeout(function () { c.style.transform = ""; }, 300); }
-      setTimeout(function () { document.getElementById("letter-modal").classList.add("open"); }, 300);
+    function toLetter() {
+      sfx("whoosh");
+      showScreen("s-letter");
+      /* reset scroll state each time we enter this screen */
+      scrReset();
     }
 
-    function closeLetter() { document.getElementById("letter-modal").classList.remove("open"); }
+    /* ═══════════════════ SCROLL LETTER ENGINE ═══════════════════ */
+    var scrState = "closed", scrToken = 0, scrSkip = false;
 
-    function celebrate() { sfx("celebrate"); closeLetter(); confetti(); showScreen("s-bday"); startHearts(); }
+    var SCR_MSGS = [
+      "Happy Birthday, Varshini 💗",
+      "You are the most beautiful part of my life, and I'm so incredibly lucky to have you. Your smile has the power to make everything better — it's honestly one of the most beautiful things in this world.",
+      "I want you to know that you are *irreplaceable*. You matter more than words can say. Every single day you inspire me, make me laugh, and remind me what truly matters in life.",
+      "On your special day, I want you to feel every ounce of love I have for you. You deserve the world — nothing but pure joy, warmth, and magic, just like you bring to everyone around you. 🌹",
+      "Always yours. Always here. Always grateful. ♥"
+    ];
+
+    function scrBuild() {
+      var inn = document.getElementById("scr-in");
+      var divSvg = '<svg class="scr-divider" viewBox="0 0 120 12" fill="currentColor"><path d="M0 6h46M74 6h46" stroke="currentColor" fill="none"/><circle cx="60" cy="6" r="3.2"/><circle cx="51" cy="6" r="1.6"/><circle cx="69" cy="6" r="1.6"/></svg>';
+      inn.innerHTML = '<h2>Just For You ✦</h2>' + divSvg;
+      SCR_MSGS.forEach(function(t, mi) {
+        var p = document.createElement("p");
+        if (mi === SCR_MSGS.length - 1) p.className = "scr-sig";
+        t.split(/\*(.+?)\*/).forEach(function(seg, i) {
+          if (!seg) return;
+          if (i % 2 === 1) {
+            var em = document.createElement("em");
+            Array.from(seg).forEach(function(ch) {
+              var s = document.createElement("span"); s.className = "scr-c"; s.textContent = ch; em.appendChild(s);
+            });
+            p.appendChild(em);
+          } else {
+            Array.from(seg).forEach(function(ch) {
+              var s = document.createElement("span"); s.className = "scr-c"; s.textContent = ch; p.appendChild(s);
+            });
+          }
+        });
+        inn.appendChild(p);
+      });
+    }
+
+    function scrWrite() {
+      var my = ++scrToken; scrSkip = false; var n = 0;
+      var chars = document.querySelectorAll("#scr-in .scr-c");
+      function next(idx) {
+        if (my !== scrToken || idx >= chars.length) {
+          if (my === scrToken) {
+            scrState = "done";
+            document.getElementById("scr-btns").classList.add("show");
+          }
+          return;
+        }
+        chars[idx].classList.add("on");
+        var ch = chars[idx].textContent;
+        var delay = scrSkip ? 0 : (/[.,—!?]/.test(ch) ? 190 : 24);
+        if (!ch.trim()) delay = 0;
+        setTimeout(function() { next(idx + 1); }, delay);
+      }
+      next(0);
+    }
+
+    function scrOpen() {
+      if (scrState !== "closed") { if (scrState === "writing") scrSkip = true; return; }
+      scrState = "opening";
+      sfx("letter");
+      document.getElementById("scr-hint").classList.add("gone");
+      var wrap = document.getElementById("scr-wrap");
+      wrap.classList.add("untie");
+      setTimeout(function() {
+        scrBuild();
+        var paper = document.getElementById("scr-paper");
+        wrap.classList.add("open");
+        paper.style.height = paper.scrollHeight + "px";
+        setTimeout(function() {
+          paper.style.height = "auto";
+          scrState = "writing";
+          scrWrite();
+        }, 1900);
+      }, 1500);
+    }
+
+    function scrRollUp() {
+      if (scrState !== "done") return;
+      scrToken++; scrState = "closing";
+      document.getElementById("scr-btns").classList.remove("show");
+      var paper = document.getElementById("scr-paper");
+      paper.style.height = paper.offsetHeight + "px";
+      void paper.offsetHeight;
+      var wrap = document.getElementById("scr-wrap");
+      wrap.classList.remove("open");
+      paper.style.height = "0px";
+      var sl = document.getElementById("s-letter");
+      if (sl) sl.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(function() {
+        wrap.classList.remove("untie");
+        document.getElementById("scr-hint").classList.remove("gone");
+        scrState = "closed";
+      }, 1900);
+    }
+
+    function scrReset() {
+      scrToken++;
+      scrState = "closed";
+      scrSkip = false;
+      var wrap = document.getElementById("scr-wrap");
+      if (wrap) { wrap.classList.remove("untie", "open"); }
+      var paper = document.getElementById("scr-paper");
+      if (paper) { paper.style.transition = "none"; paper.style.height = "0px"; setTimeout(function(){ paper.style.transition = ""; }, 50); }
+      var hint = document.getElementById("scr-hint");
+      if (hint) hint.classList.remove("gone");
+      var btns = document.getElementById("scr-btns");
+      if (btns) btns.classList.remove("show");
+    }
+
+    function scrCelebrate() {
+      sfx("celebrate");
+      confetti();
+      showScreen("s-bday");
+      startHearts();
+      /* shower marigold petals */
+      var cols = ["#e8a020","#f4c13a","#b3261e","#e3b955"];
+      for (var i = 0; i < 70; i++) {
+        (function(ii) {
+          var s = document.createElement("span");
+          s.className = "scr-petal";
+          s.style.left = Math.random() * 100 + "vw";
+          s.style.background = cols[ii % 4];
+          s.style.setProperty("--d", (3 + Math.random() * 3) + "s");
+          s.style.setProperty("--x", (Math.random() * 160 - 80) + "px");
+          s.style.animationDelay = Math.random() * 1.2 + "s";
+          document.body.appendChild(s);
+          setTimeout(function() { s.remove(); }, 7500);
+        })(i);
+      }
+    }
+
+    /* wire up scroll tap */
+    (function() {
+      var w = document.getElementById("scr-wrap");
+      if (!w) return;
+      w.addEventListener("click", function() { scrOpen(); });
+      w.addEventListener("keydown", function(e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); scrOpen(); }
+      });
+    })();
 
     function restartAll() {
-      sfx("whoosh"); closeLetter(); resetCode(); stopHearts();
+      sfx("whoosh"); resetCode(); stopHearts();
       setTimeout(function () { showScreen("s-lock"); }, 400);
     }
 
@@ -2826,7 +2910,7 @@
 
     /* Prevent pull-to-refresh on non-scroll screens */
     document.addEventListener("touchmove", function (e) {
-      if (!e.target.closest("#s-bday,#letter-modal")) e.preventDefault();
+      if (!e.target.closest("#s-bday,#s-letter")) e.preventDefault();
     }, { passive: false });
   </script>
 </body>
