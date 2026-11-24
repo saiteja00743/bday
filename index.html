@@ -338,6 +338,19 @@
       text-align: center;
       max-width: 260px
     }
+    .tap-hint {
+      margin-top: 36px;
+      font-family: var(--fs);
+      font-style: italic;
+      font-size: clamp(14px, 4vw, 17px);
+      color: rgba(227, 185, 85, .9);
+      letter-spacing: .08em;
+      animation: tap-pulse 1.5s ease-in-out infinite
+    }
+    @keyframes tap-pulse {
+      0%, 100% { opacity: 1; transform: scale(1) }
+      50%       { opacity: .4; transform: scale(.95) }
+    }
 
     /* ── SCREEN 2: PASSCODE ── */
     #s-pass .content {
@@ -1078,17 +1091,19 @@
       overflow: hidden;
       position: relative;
       margin-bottom: 16px;
-      border-radius: 20px
+      border-radius: 20px;
+      touch-action: pan-y
     }
 
     .gal-slider {
       display: flex;
       transition: transform .4s var(--ease);
-      will-change: transform
+      /* width set dynamically by buildGallery */
     }
 
     .gal-slide {
-      min-width: 100%;
+      flex: 0 0 100%;
+      width: 100%;
       border-radius: 20px;
       overflow: hidden;
       border: 1px solid rgba(200, 16, 46, .25);
@@ -1969,6 +1984,7 @@
       <span class="lock-heart">♥</span>
       <h1 class="locked-title">LOCKED</h1>
       <p class="locked-sub">A little surprise is waiting for you...</p>
+      <div class="tap-hint">👆 Tap to begin</div>
     </div>
   </div>
 
@@ -2118,23 +2134,7 @@
       <p class="gallery-sub">Swipe for more ✦</p>
       <div class="gal-wrap" id="gal-wrap">
         <div class="gal-slider" id="gal-slider">
-          <!-- REPLACE: swap photo-ph divs with <img src="..."> -->
-          <div class="gal-slide">
-            <div class="photo-ph">🌹<p>Photo 1 — Add your memory</p>
-            </div>
-          </div>
-          <div class="gal-slide">
-            <div class="photo-ph">💫<p>Photo 2 — A moment to remember</p>
-            </div>
-          </div>
-          <div class="gal-slide">
-            <div class="photo-ph">🎀<p>Photo 3 — Another beautiful day</p>
-            </div>
-          </div>
-          <div class="gal-slide">
-            <div class="photo-ph">🌸<p>Photo 4 — So many memories</p>
-            </div>
-          </div>
+          <!-- slides built dynamically by buildGallery() -->
         </div>
       </div>
       <div class="gal-dots" id="gal-dots"></div>
@@ -2379,7 +2379,7 @@
         this.x += this.vx; this.y += this.vy;
         if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
       };
-      for (var i = 0; i < 70; i++) parts.push(new Pt());
+      for (var i = 0; i < 25; i++) parts.push(new Pt());
       var frameHandle = 0, lastFrame = 0;
       function loop(timestamp) {
         frameHandle = 0;
@@ -2412,36 +2412,53 @@
        GALLERY
     ══════════════════════════════════════ */
     function buildGallery() {
-      if (CFG.photos && CFG.photos.length) {
-        var sl = document.getElementById("gal-slider"); sl.innerHTML = "";
-        CFG.photos.forEach(function (item, i) {
-          var url = typeof item === "string" ? item : item.url;
-          var caption = typeof item === "object" ? item.caption : ("Memory " + (i + 1));
-          var slide = document.createElement("div");
-          slide.className = "gal-slide";
+      var sl = document.getElementById("gal-slider");
+      if (!sl) return;
+      sl.innerHTML = "";
+      var photos = (CFG.photos && CFG.photos.length) ? CFG.photos : [
+        {url:"", caption:"Photo 1 — Add your memory"},
+        {url:"", caption:"Photo 2 — A moment to remember"}
+      ];
+      photos.forEach(function (item, i) {
+        var url = typeof item === "string" ? item : item.url;
+        var caption = typeof item === "object" ? item.caption : ("Memory " + (i + 1));
+        var slide = document.createElement("div");
+        slide.className = "gal-slide";
 
+        if (url) {
           var img = document.createElement("img");
           img.src = url;
           img.alt = caption;
-          img.loading = "lazy";
+          img.loading = i < 3 ? "eager" : "lazy";
+          img.decoding = "async";
           img.onerror = function () {
             var ph = document.createElement("div"); ph.className = "photo-ph";
             ph.innerHTML = "🌹<p>" + caption + "</p>";
             this.parentNode.replaceChild(ph, this);
           };
           slide.appendChild(img);
+        } else {
+          var ph = document.createElement("div"); ph.className = "photo-ph";
+          ph.innerHTML = "🌹<p>" + caption + "</p>";
+          slide.appendChild(ph);
+        }
 
-          if (caption) {
-            var cap = document.createElement("div");
-            cap.className = "gal-caption";
-            cap.textContent = caption;
-            slide.appendChild(cap);
-          }
-          sl.appendChild(slide);
-        });
-      }
-      var slider = document.getElementById("gal-slider");
-      gCount = slider ? slider.children.length : 0;
+        if (caption) {
+          var cap = document.createElement("div");
+          cap.className = "gal-caption";
+          cap.textContent = caption;
+          slide.appendChild(cap);
+        }
+        sl.appendChild(slide);
+      });
+
+      gCount = sl.children.length;
+      /* KEY FIX: set slider total width so slides lay out side-by-side */
+      sl.style.width = (gCount * 100) + "%";
+      /* each slide must be 1/N of slider = viewport width */
+      var slideEls = sl.querySelectorAll(".gal-slide");
+      slideEls.forEach(function(s) { s.style.width = (100 / gCount) + "%"; });
+
       var wrap = document.getElementById("gal-dots"); if (!wrap) return;
       wrap.innerHTML = "";
       for (var i = 0; i < gCount; i++) {
@@ -2450,13 +2467,15 @@
         (function (idx) { d.onclick = function () { goSlide(idx); }; })(i);
         wrap.appendChild(d);
       }
+      goSlide(0);
     }
 
     function goSlide(i) {
       if (gCount === 0) return;
       gIdx = ((i % gCount) + gCount) % gCount;   /* loop around */
       var sl = document.getElementById("gal-slider");
-      if (sl) sl.style.transform = "translateX(-" + gIdx * 100 + "%)";
+      /* slider width = gCount*100%; each slide = (100/gCount)%; so offset = gIdx*(100/gCount)% of slider */
+      if (sl) sl.style.transform = "translateX(-" + (gIdx * (100 / gCount)) + "%)";
       document.querySelectorAll(".g-dot").forEach(function (d, j) { d.classList.toggle("active", j === gIdx); });
     }
 
@@ -2489,7 +2508,10 @@
         if (Math.abs(dx) > Math.abs(dy)) {
           e.preventDefault();
           sl.style.transition = "none";
-          sl.style.transform = "translateX(calc(-" + gIdx * 100 + "% + " + dx + "px))";
+          /* base offset in % of slider (gCount*100%); slide width = 100/gCount% of slider */
+          var basePct = gIdx * (100 / gCount);
+          var dragPct = (dx / (gw.offsetWidth || 1)) * (100 / gCount);
+          sl.style.transform = "translateX(" + (-basePct + dragPct) + "%)";
         }
       }, { passive: false });
 
@@ -2497,7 +2519,7 @@
         if (!isDragging) return; isDragging = false;
         sl.style.transition = "";
         var dx = e.changedTouches[0].clientX - startX;
-        if (Math.abs(dx) > 30) { goSlide(dx > 0 ? gIdx - 1 : gIdx + 1); }
+        if (Math.abs(dx) > 40) { goSlide(dx > 0 ? gIdx - 1 : gIdx + 1); }
         else { goSlide(gIdx); }
         galAutoStart();
       }, { passive: true });
@@ -2506,13 +2528,15 @@
       gw.addEventListener("mousemove", function(e) {
         if (!isDragging) return;
         sl.style.transition = "none";
-        sl.style.transform = "translateX(calc(-" + gIdx * 100 + "% + " + (e.clientX - startX) + "px))";
+        var basePct = gIdx * (100 / gCount);
+        var dragPct = ((e.clientX - startX) / (gw.offsetWidth || 1)) * (100 / gCount);
+        sl.style.transform = "translateX(" + (-basePct + dragPct) + "%)";
       });
       gw.addEventListener("mouseup", function(e) {
         if (!isDragging) return; isDragging = false;
         sl.style.transition = "";
         var dx = e.clientX - startX;
-        if (Math.abs(dx) > 30) goSlide(dx > 0 ? gIdx - 1 : gIdx + 1);
+        if (Math.abs(dx) > 40) goSlide(dx > 0 ? gIdx - 1 : gIdx + 1);
         else goSlide(gIdx);
         galAutoStart();
       });
