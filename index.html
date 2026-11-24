@@ -1810,11 +1810,11 @@
   <div class="floating-hearts-wrap" id="fhearts"></div>
 
   <!-- ═══ SCREEN 1: LOCK ═══ -->
-  <div class="screen active" id="s-lock">
+  <div class="screen active" id="s-lock" onclick="toPasscode()" style="cursor:pointer">
     <div class="screen-bg bg-lock"></div>
     <div class="stars-wrap" id="st-lock"></div>
     <div class="content">
-      <div class="profile-wrap" id="lock-btn" onclick="toPasscode()">
+      <div class="profile-wrap" id="lock-btn">
         <div class="profile-glow"></div>
         <div class="profile-ring"></div>
         <!-- REPLACE: add profilePicUrl in CONFIG below to use a photo -->
@@ -2074,14 +2074,30 @@
       emoji: "🌸",                    // ← placeholder emoji
       birthday: "2005-11-28",         // ← YYYY-MM-DD
       photos: [
-        { url: "1.jpg", caption: "Where it all began... so adorable! 🥺✨" },
-        { url: "3.jpg", caption: "Pure festive joy & your contagious smile 🌸" },
-        { url: "4.jpg", caption: "A bouquet for the prettiest flower 💐❤️" },
-        { url: "5.jpg", caption: "That sweet smile that brightens any room 💖" },
-        { url: "6.jpg", caption: "Radiant, happy & glowing in red 🌹" },
-        { url: "7.jpg", caption: "Pure grace, poise & elegance 💫" },
-        { url: "8.jpg", caption: "Peaceful vibes by the lake 🌊✨" },
-        { url: "2.jpeg", caption: "A true masterpiece, just like you 🎨❤️" }
+        { url: "gallery/g1.jpg",  caption: "Gorgeous as always ✨" },
+        { url: "gallery/g2.jpg",  caption: "That smile says it all 💖" },
+        { url: "gallery/g3.jpg",  caption: "Pure elegance 🌸" },
+        { url: "gallery/g4.jpg",  caption: "My favourite person 🥺❤️" },
+        { url: "gallery/g5.jpg",  caption: "So much happiness in one frame 💕" },
+        { url: "gallery/g6.jpg",  caption: "Radiant & beautiful 🌟" },
+        { url: "gallery/g7.jpg",  caption: "Every pic a masterpiece 🎨" },
+        { url: "gallery/g8.jpg",  caption: "Sweet memories 🍬" },
+        { url: "gallery/g9.jpg",  caption: "Joy looks good on you 😊" },
+        { url: "gallery/g10.jpg", caption: "Effortlessly stunning 💫" },
+        { url: "gallery/g11.jpg", caption: "Where it all began 🥺✨" },
+        { url: "gallery/g12.jpg", caption: "A bouquet for the prettiest flower 💐" },
+        { url: "gallery/g13.jpg", caption: "Grace & poise 👑" },
+        { url: "gallery/g14.jpg", caption: "Pure festive joy 🌸" },
+        { url: "gallery/g15.jpg", caption: "That contagious smile 🌼" },
+        { url: "gallery/g16.jpg", caption: "Radiant in every frame 🌹" },
+        { url: "gallery/g17.jpg", caption: "A true gem 💎" },
+        { url: "gallery/g18.jpg", caption: "Sweet & serene 🕊️" },
+        { url: "gallery/g19.jpg", caption: "Golden vibes ✨" },
+        { url: "gallery/g20.jpg", caption: "Peaceful & beautiful 🌊" },
+        { url: "gallery/g21.jpg", caption: "Simply breathtaking 🫶" },
+        { url: "gallery/g22.jpg", caption: "Every moment with you is precious 💖" },
+        { url: "gallery/g23.jpg", caption: "Born to shine 🌟" },
+        { url: "gallery/g24.jpg", caption: "Happy Birthday, Varshini! 🎂❤️" }
       ],
       musicUrl: "vasanthalu .mp3",   // ← background music (plays after unlock)
       showNums: false,                // ← true=show digits, false=show dots
@@ -2292,8 +2308,9 @@
     function toPasscode() {
       sfx("heart");
       var btn = document.getElementById("lock-btn");
-      if (btn) { btn.style.transform = "scale(.95)"; setTimeout(function () { btn.style.transform = ""; }, 200); }
-      setTimeout(function () { showScreen("s-pass"); sfx("whoosh"); }, 300);
+      if (btn) { btn.style.transform = "scale(.97)"; setTimeout(function () { btn.style.transform = ""; }, 150); }
+      showScreen("s-pass");
+      sfx("whoosh");
     }
 
     function toLock() { sfx("whoosh"); resetCode(); showScreen("s-lock"); }
