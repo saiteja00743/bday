@@ -80,6 +80,10 @@
       pointer-events: all
     }
 
+    .screen:not(.active) .star {
+      animation-play-state: paused
+    }
+
     .screen-bg {
       position: absolute;
       inset: 0;
@@ -2015,7 +2019,7 @@
       <div class="panda-wrap">
         <div class="panda-glow"></div>
         <div class="panda-circle">
-          <video id="vid-load" src="3.mp4" autoplay loop muted playsinline
+          <video id="vid-load" src="3.mp4" loop muted playsinline preload="none"
             style="width:100%;height:100%;object-fit:cover;display:block"></video>
         </div>
         <div class="hmm-bubble">Hmm...</div>
@@ -2033,7 +2037,7 @@
     <div class="screen-bg bg-special"></div>
     <div class="stars-wrap" id="st-special"></div>
     <div class="content">
-      <div class="sp-panda"><video id="vid-special" src="1.mp4" autoplay loop muted playsinline
+      <div class="sp-panda"><video id="vid-special" src="1.mp4" loop muted playsinline preload="none"
           style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></video></div>
       <h2 class="sp-heading">It's Your<br><span>Special Day</span> 🌸</h2>
       <p class="sp-sub">I made something special for you...</p>
@@ -2046,7 +2050,7 @@
     <div class="screen-bg bg-bday"></div>
     <div class="stars-wrap" id="st-count"></div>
     <div class="content">
-      <div class="count-panda"><video id="vid-count" src="2.mp4" autoplay loop muted playsinline
+      <div class="count-panda"><video id="vid-count" src="2.mp4" loop muted playsinline preload="none"
           style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></video></div>
       <h2 class="count-h">Happy Birthday<br><span id="count-name">My Girl</span> 🎀</h2>
       <p class="count-lbl">You have completed</p>
@@ -2271,6 +2275,7 @@
     var gIdx = 0, gCount = 0;
     var gSX = 0, gDrag = false;
     var heartTmr = null;
+    var cakeAdvanceTimer = null;
     var musicOn = false;
 
     /* ══════════════════════════════════════
@@ -2375,14 +2380,32 @@
         if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
       };
       for (var i = 0; i < 70; i++) parts.push(new Pt());
-      (function loop() {
-        ctx.clearRect(0, 0, W, H);
-        parts.forEach(function (p) {
-          p.upd(); ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = p.col; ctx.fill();
-        });
-        requestAnimationFrame(loop);
-      })();
+      var frameHandle = 0, lastFrame = 0;
+      function loop(timestamp) {
+        frameHandle = 0;
+        if (document.hidden) return;
+        if (timestamp - lastFrame >= 1000 / 30) {
+          ctx.clearRect(0, 0, W, H);
+          parts.forEach(function (p) {
+            p.upd(); ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.col; ctx.fill();
+          });
+          lastFrame = timestamp;
+        }
+        frameHandle = requestAnimationFrame(loop);
+      }
+      function startLoop() {
+        if (!frameHandle) frameHandle = requestAnimationFrame(loop);
+      }
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden && frameHandle) {
+          cancelAnimationFrame(frameHandle);
+          frameHandle = 0;
+        } else {
+          startLoop();
+        }
+      });
+      startLoop();
     }
 
     /* ══════════════════════════════════════
@@ -2507,12 +2530,17 @@
       document.querySelectorAll(".screen").forEach(function (s) { s.classList.remove("active"); });
       var el = document.getElementById(id); if (el) el.classList.add("active");
       curScreen = id;
-      /* ensure videos play when their screen activates (mobile autoplay policy) */
       var vidMap = { "s-load": "vid-load", "s-special": "vid-special", "s-count": "vid-count" };
-      if (vidMap[id]) {
-        var v = document.getElementById(vidMap[id]);
-        if (v) { v.currentTime = 0; v.play().catch(function () { }); }
-      }
+      Object.keys(vidMap).forEach(function (screenId) {
+        var video = document.getElementById(vidMap[screenId]);
+        if (!video) return;
+        if (screenId === id) {
+          video.currentTime = 0;
+          video.play().catch(function () { });
+        } else {
+          video.pause();
+        }
+      });
     }
 
     function toPasscode() {
@@ -2554,7 +2582,11 @@
     function toBirthday() {
       sfx("whoosh");
       showScreen("s-count");
-      setTimeout(function () { sfx("fanfare"); toCake(); }, 5500);
+      clearTimeout(cakeAdvanceTimer);
+      cakeAdvanceTimer = setTimeout(function () {
+        cakeAdvanceTimer = null;
+        if (curScreen === "s-count") { sfx("fanfare"); toCake(); }
+      }, 5500);
     }
 
     function toMemories() { sfx("whoosh"); showScreen("s-bday"); startHearts(); goSlide(0); galAutoStart(); }
@@ -2691,6 +2723,9 @@
        🎂  CAKE SCREEN
     ══════════════════════════════════════ */
     function toCake() {
+      if (curScreen === "s-cake") return;
+      clearTimeout(cakeAdvanceTimer);
+      cakeAdvanceTimer = null;
       sfx("whoosh");
       /* pause main music while birthday song plays */
       var au = document.getElementById("bg-music");
