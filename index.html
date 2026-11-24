@@ -2486,6 +2486,7 @@
       var au = document.getElementById("bg-music");
       var btn = document.getElementById("music-btn");
       if (au && au.src && !musicOn) {
+        au.volume = 0.25;
         au.play().then(function () {
           musicOn = true;
           if (btn) btn.textContent = "🎵";
@@ -2643,7 +2644,14 @@
     /* ══════════════════════════════════════
        🎂  CAKE SCREEN
     ══════════════════════════════════════ */
-    function toCake() { sfx("whoosh"); showScreen("s-cake"); ckInit(); }
+    function toCake() {
+      sfx("whoosh");
+      /* pause main music while birthday song plays */
+      var au = document.getElementById("bg-music");
+      if (au && !au.paused) au.pause();
+      showScreen("s-cake");
+      ckInit();
+    }
 
     var ckStep = 0, ckBusy = false;
     var ckAge = new Date().getFullYear() - new Date(CFG.birthday).getFullYear();
@@ -2946,7 +2954,13 @@
       }, 1500);
     }
 
-    function ckCelebrate() { ckStopSong(); ckPetals(); sfx("celebrate"); confetti(); startHearts(); showScreen("s-bday"); }
+    function ckCelebrate() {
+      ckStopSong();
+      /* resume main music at 25% vol */
+      var au = document.getElementById("bg-music");
+      if (au && musicOn && au.paused) { au.volume = 0.25; au.play().catch(function(){}); }
+      ckPetals(); sfx("celebrate"); confetti(); startHearts(); showScreen("s-bday");
+    }
     function ckAgain() { ckStopSong(); ckInit(); }
 
     /* wire up scroll tap */
@@ -3087,7 +3101,7 @@
       var au = document.getElementById("bg-music");
       var btn = document.getElementById("music-btn");
       if (musicOn) { au.pause(); btn.textContent = "🔇"; musicOn = false; }
-      else { au.play().catch(function () { }); btn.textContent = "🎵"; musicOn = true; }
+      else { au.volume = 0.25; au.play().catch(function () { }); btn.textContent = "🎵"; musicOn = true; }
     }
 
     /* ══════════════════════════════════════
