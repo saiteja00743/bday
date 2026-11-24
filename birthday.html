@@ -7,7 +7,7 @@
   <title>A Secret Surprise For You 🌹</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500&family=Gloock&family=Caveat:wght@500;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500;600&family=Inter:wght@300;400;500&family=Gloock&family=Caveat:wght@500;700&family=Rozha+One&family=Kalam:wght@400;700&family=Noto+Serif+Telugu:wght@500;700&display=swap"
     rel="stylesheet">
   <style>
     *,
@@ -1380,41 +1380,39 @@
     }
 
     /* ══════════════════════════════════════
-       🗒️  DIARY SCREEN
+       🗒️  DIARY SCREEN — Vintage Indian Classic
     ══════════════════════════════════════ */
     #s-diary {
-      background: radial-gradient(ellipse at 50% 20%, #3a0a0a 0%, #0d0000 60%, #000 100%);
+      background: radial-gradient(circle at 50% 40%, #6b1a1a, #2a0808 85%);
       overflow-y: auto;
     }
     #s-diary .content {
       width: 100%;
       max-width: 760px;
-      padding: 24px 12px 48px;
+      padding: 10px 12px 48px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 10px;
     }
-    .diary-title {
-      font-family: 'Caveat', cursive;
-      font-size: clamp(1.4rem, 5vw, 2rem);
-      color: #e8b4ae;
-      letter-spacing: .05em;
-      text-align: center;
-      opacity: .85;
+    /* marigold garland */
+    .dv-garland {
+      width: min(700px,100%); height: 40px; position: relative; margin-bottom: 4px;
+      background: radial-gradient(circle at 14px 18px,#e8a020 0 7px,#c46a10 8px 9px,transparent 10px) 0 0/28px 40px repeat-x;
     }
-    /* ---- Diary 3D book ---- */
+    .dv-garland::before { content:""; position:absolute; left:0; right:0; top:6px; height:2px; background:#9a6b2a; }
+    /* dwrap / book */
     .dwrap { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
     .book3d {
       container-type: inline-size;
       position: relative;
-      width: min(680px, 100%);
+      width: min(700px, 100%);
       aspect-ratio: 3/2;
       perspective: 2000px;
       transition: transform .9s cubic-bezier(.5,0,.2,1);
     }
     .book3d.b-closed { transform: translateX(-25%); }
-    .book3d.b-end    { transform: translateX(25%);  }
+    .book3d.b-end    { transform: translateX(25%); }
     .leaf {
       position: absolute; left: 50%; top: 0; width: 50%; height: 100%;
       transform-origin: left center;
@@ -1423,99 +1421,115 @@
       cursor: pointer;
     }
     .leaf.flipped { transform: rotateY(-180deg); }
+    /* aged paper pages */
     .dface {
       position: absolute; inset: 0;
       backface-visibility: hidden; -webkit-backface-visibility: hidden;
-      background: #fbf0e8;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       text-align: center; gap: 3%;
-      padding: 8% 9%;
-      overflow: hidden;
+      padding: 10% 11%; overflow: hidden;
+      color: #3a2412;
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .28 0 0 0 0 .1 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 25% 15%,#f6e9c9,transparent 60%),
+        radial-gradient(circle at 85% 90%,#cfa86a66,transparent 55%),
+        #ecd9ae;
     }
-    .dface.front { border-radius: 0 8px 8px 0; box-shadow: inset 10px 0 14px -10px #0005; }
-    .dface.back  { transform: rotateY(180deg); border-radius: 8px 0 0 8px; box-shadow: inset -10px 0 14px -10px #0005; }
-    .dface.d-cover {
-      background: #5a1114;
-      color: #f4ede1;
-      box-shadow: inset 0 0 0 7px #5a1114, inset 0 0 0 9px #e8b4ae;
+    .dface.front { border-radius: 0 8px 8px 0; box-shadow: inset 14px 0 16px -12px #0007, inset 0 0 44px #8a5a2a66; }
+    .dface.back  { transform: rotateY(180deg); border-radius: 8px 0 0 8px; box-shadow: inset -14px 0 16px -12px #0007, inset 0 0 44px #8a5a2a66; }
+    .dface::before { content:""; position:absolute; inset:4%; border:3px double #9a6b2a; pointer-events:none; }
+    /* leather cover */
+    .dface.dv-cover {
+      color: #e3b955;
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.7' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .3 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"),
+        radial-gradient(circle at 50% 40%,#7d2222,#4a1010 85%);
     }
-    .dface.d-cover .d-big-title { font: 400 clamp(2rem,12cqw,5.5rem)/1 'Gloock',serif; color: #f4ede1; }
-    .dface.d-cover .d-script    { font-family: 'Caveat',cursive; font-weight: 700; font-size: clamp(1.2rem,5cqw,2.4rem); color: #e8b4ae; }
-    .dface.d-cover small        { font: 500 clamp(.9rem,3.4cqw,1.5rem) 'Caveat',cursive; color: #e8b4ae; }
-    .d-big   { font: 400 clamp(2.4rem,11cqw,6.5rem)/1 'Gloock',serif; color: #7a1f1f; }
-    .d-txt   { font: 500 clamp(13px,3.4cqw,22px)/1.3 'Caveat',cursive; color: #2a1212; }
-    .d-script-sm { font-family: 'Caveat',cursive; font-weight: 700; color: #7a1f1f; font-size: clamp(1rem,4cqw,1.8rem); }
-    /* polaroid */
-    .d-pol {
-      background: #fff; padding: 7px 7px 28px;
-      box-shadow: 0 3px 10px #0004;
-      transform: rotate(3deg);
-      width: 76%; aspect-ratio: 4/5;
-      flex: 1; min-height: 0; margin: 0;
-      position: relative; display: flex; flex-direction: column;
+    .dface.dv-cover::before { border:2px solid #e3b955; box-shadow:0 0 0 5px #4a1010, 0 0 0 6.5px #e3b955; }
+    .dface.dv-cover b { font: 400 clamp(2rem,12cqw,5.2rem)/1 'Rozha One',serif; color: #e3b955; text-shadow: 0 2px 0 #0008; }
+    .dface.dv-cover small { font: 400 clamp(.8rem,3.2cqw,1.4rem) 'Kalam',cursive; color: #f0d38a; }
+    /* ornaments */
+    .dv-crn { position:absolute; width:11%; aspect-ratio:1; color:#9a6b2a; pointer-events:none; z-index:2; }
+    .dv-crn svg { width:100%; height:100%; display:block; }
+    .dv-cover .dv-crn { color:#e3b955; }
+    .dv-crn.tl{top:2.8%;left:2.8%} .dv-crn.tr{top:2.8%;right:2.8%;transform:scaleX(-1)}
+    .dv-crn.bl{bottom:2.8%;left:2.8%;transform:scaleY(-1)} .dv-crn.br{bottom:2.8%;right:2.8%;transform:scale(-1)}
+    /* text styles */
+    .dface p { font: 400 clamp(11px,3cqw,19px)/1.35 'Kalam',cursive; position:relative; }
+    .dface p.dv-cap { font-weight:700; color:#6b1a1a; }
+    .dv-big { font: 400 clamp(2.4rem,11cqw,6rem)/1 'Rozha One',serif; color:#6b1a1a; }
+    .dv-dot { width:clamp(8px,2.4cqw,15px); aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 35%,#e0483c,#b3261e); box-shadow:0 0 0 2px #b3261e44; }
+    .dv-tel { font: 700 clamp(11px,3.2cqw,20px)/1.3 'Noto Serif Telugu',serif; color:#b3261e; }
+    .dv-divider { width:46%; color:#9a6b2a; flex:none; }
+    .dv-mandala { width:46%; flex:none; }
+    .dv-flower  { width:40%; flex:none; }
+    /* vintage photo frames */
+    .dv-ph {
+      background: var(--dv-img, linear-gradient(135deg,#d9b98a,#a8794a)) center/cover no-repeat;
+      position:relative; width:100%; height:100%;
+      filter: sepia(.55) contrast(1.05);
     }
-    .d-pol .d-ph { flex: 1; height: auto; }
-    .d-pol em {
-      position: absolute; bottom: 3px; left: 0; right: 0;
-      text-align: center; font: 500 clamp(13px,3.5cqw,1.1rem) 'Caveat',cursive; color: #7a1f1f;
+    .dv-frame {
+      width:76%; flex:1; min-height:0; display:flex;
+      background:#f7ecd2; padding:6px;
+      box-shadow:0 2px 7px #0006; transform:rotate(-1.5deg); position:relative;
     }
-    .d-tape {
-      position: absolute; top: -10px; left: 50%; width: 60px; height: 20px;
-      background: #e8b4ae99; transform: translateX(-50%) rotate(-4deg);
+    .dv-frame.lg { width:70%; transform:rotate(1.5deg); }
+    .dv-frame .dv-ph { flex:1; height:auto; }
+    .dv-frame::before,.dv-frame::after { content:""; position:absolute; border:11px solid; z-index:3; }
+    .dv-frame::before { top:0;left:0; border-color:#7a4a22 transparent transparent #7a4a22; }
+    .dv-frame::after  { bottom:0;right:0; border-color:transparent #7a4a22 #7a4a22 transparent; }
+    .dv-stamp {
+      position:absolute; top:7%; right:9%; z-index:3;
+      border:2px solid #b3261e; color:#b3261e;
+      font: 700 clamp(7px,1.9cqw,12px) 'Kalam',cursive;
+      padding:1px 6px; border-radius:4px;
+      transform:rotate(9deg); opacity:.75; letter-spacing:.06em;
     }
-    /* mini photo strip */
-    .d-mini {
-      width: 78%; flex: 1; min-height: 0; padding: 5px;
-      background: #fff; box-shadow: 0 2px 8px #0003;
-      transform: rotate(-2deg); display: flex;
+    /* brass spine studs */
+    .dv-spine {
+      position:absolute; left:50%; top:8%; bottom:8%; width:16px;
+      transform:translateX(-50%);
+      display:flex; flex-direction:column; justify-content:space-between;
+      z-index:300; pointer-events:none; transition:opacity .4s;
     }
-    .d-mini .d-ph { flex: 1; height: auto; }
-    /* photo div */
-    .d-ph {
-      background: var(--d-img,linear-gradient(135deg,#e8b4ae,#c98b8b)) center/cover no-repeat;
-      position: relative; width: 100%; height: 100%;
+    .dv-spine i {
+      height:12px; width:12px; border-radius:50%;
+      background: radial-gradient(circle at 35% 30%,#ffe9a8,#b98a2e 60%,#6a4812);
     }
-    /* spine */
-    .d-spine {
-      position: absolute; left: 50%; top: 8%; bottom: 8%;
-      width: 20px; transform: translateX(-50%);
-      display: flex; flex-direction: column; justify-content: space-between;
-      z-index: 300; pointer-events: none; transition: opacity .4s;
-    }
-    .d-spine i { height: 10px; border-radius: 5px; background: #3a0000; }
-    .book3d.b-closed .d-spine, .book3d.b-end .d-spine { opacity: 0; }
+    .book3d.b-closed .dv-spine, .book3d.b-end .dv-spine { opacity:0; }
     /* controls */
     .dctl {
-      display: flex; gap: 12px; align-items: center;
-      color: #e8b4ae; font: 500 1.3rem 'Caveat',cursive;
+      display:flex; gap:12px; align-items:center;
+      color:#e3b955; font:400 1.1rem 'Kalam',cursive;
     }
     .dctl button {
-      font: 700 1.6rem 'Caveat',cursive;
-      color: #7a1f1f; background: #fbf0e8;
-      border: 0; border-radius: 99px;
-      padding: 2px 20px; cursor: pointer;
-      box-shadow: 0 2px 8px #0004;
+      font: 700 1.2rem 'Kalam',cursive;
+      color:#4a1010; background:#e3b955;
+      border:2px solid #9a6b2a; border-radius:99px;
+      padding:2px 18px; cursor:pointer;
       transition: transform .15s;
     }
-    .dctl button:active { transform: scale(.93); }
-    .dctl button:disabled { opacity: .4; cursor: default; }
-    /* diary skip / continue button */
+    .dctl button:active { transform:scale(.93); }
+    .dctl button:disabled { opacity:.4; cursor:default; }
+    /* skip button */
     .btn-diary-skip {
       margin-top: 8px;
       background: transparent;
-      border: 1px solid rgba(200,16,46,.4);
+      border: 1px solid rgba(227,185,85,.4);
       border-radius: 50px;
       padding: 10px 32px;
-      font-family: var(--fd);
-      font-size: 11px;
-      letter-spacing: .2em;
-      color: rgba(200,16,46,.7);
+      font-family: 'Kalam', cursive;
+      font-size: 13px;
+      letter-spacing: .1em;
+      color: rgba(227,185,85,.7);
       cursor: pointer;
       transition: all .3s;
     }
-    .btn-diary-skip:hover { border-color: var(--cr); color: var(--cr); }
+    .btn-diary-skip:hover { border-color:#e3b955; color:#e3b955; }
     @media(max-width:640px){ .book3d { aspect-ratio: 5/4; } }
+    @media(prefers-reduced-motion:reduce){ .leaf { transition:none!important; } }
   </style>
 </head>
 
@@ -1708,13 +1722,13 @@
 
   <!-- ═══ SCREEN 8: DIARY ═══ -->
   <div class="screen" id="s-diary">
-    <div class="screen-bg" style="background:radial-gradient(ellipse at 50% 20%,#3a0a0a,#0d0000 60%,#000)"></div>
+    <div class="screen-bg" style="background:radial-gradient(circle at 50% 40%,#6b1a1a,#2a0808 85%)"></div>
     <div class="stars-wrap" id="st-diary"></div>
     <div class="content">
-      <p class="diary-title">✦ A little diary, made with love ✦</p>
+      <div class="dv-garland"></div>
       <div class="dwrap">
         <div class="book3d b-closed" id="d-book">
-          <div class="d-spine" id="d-spine"></div>
+          <div class="dv-spine" id="d-spine"></div>
         </div>
         <div class="dctl">
           <button id="d-prev" aria-label="Previous page">‹</button>
@@ -2187,103 +2201,119 @@
       if (diaryBuilt) return;
       diaryBuilt = true;
 
-      var first = CFG.name.split(" ")[0];
-      var dob   = new Date(CFG.birthday);
-      var now2  = new Date();
-      var age   = now2.getFullYear() - dob.getFullYear();
-      var ord   = function(n){ var t=["th","st","nd","rd"],v=n%100; return n+(t[(v-20)%10]||t[v]||t[0]); };
-      var dateTxt = dob.toLocaleDateString("en-GB",{day:"numeric",month:"long"});
-      var photos  = CFG.photos.map(function(p){ return typeof p === "object" ? p.url : p; });
+      var first  = CFG.name.split(" ")[0];
+      var dob    = new Date(CFG.birthday);
+      var now2   = new Date();
+      var age    = now2.getFullYear() - dob.getFullYear();
+      var ord    = function(n){ var t=["th","st","nd","rd"],v=n%100; return n+(t[(v-20)%10]||t[v]||t[0]); };
+      var dateTxt= dob.toLocaleDateString("en-GB",{day:"numeric",month:"long"});
+      var stamp  = dob.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric"}).replace(/\//g," · ");
+      var photos = CFG.photos.map(function(p){ return typeof p === "object" ? p.url : p; });
 
-      function ph(i, cls) {
-        var src = photos[i % photos.length];
-        cls = cls || "";
-        return '<div class="d-ph ' + cls + '" style="--d-img:url(\'' + src + '\')"></div>';
+      function ph(i) {
+        return '<div class="dv-ph" style="--dv-img:url(\'' + photos[i % photos.length] + '\')"></div>';
       }
 
+      /* SVG ornaments */
+      var cornerSvg = '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 37V12Q3 3 12 3h25"/><path d="M9 31V14Q9 9 14 9h17" opacity=".6"/><circle cx="16" cy="16" r="3.2" fill="currentColor" stroke="none"/><path d="M20 10q5 1 7-4M10 20q1 5-4 7"/></svg>';
+      function orn() { return ["tl","tr","bl","br"].map(function(c){ return '<span class="dv-crn '+c+'">'+cornerSvg+'</span>'; }).join(""); }
+
+      var divider = '<svg class="dv-divider" viewBox="0 0 120 12" fill="currentColor"><path d="M0 6h46M74 6h46" stroke="currentColor" fill="none"/><circle cx="60" cy="6" r="3.2"/><circle cx="51" cy="6" r="1.6"/><circle cx="69" cy="6" r="1.6"/></svg>';
+
+      function mandala(col) {
+        var p = "";
+        for (var i=0;i<12;i++) p += '<ellipse cx="50" cy="24" rx="7" ry="15" transform="rotate('+(i*30)+' 50 50)"/>';
+        for (var i=0;i<24;i++) p += '<circle cx="50" cy="9" r="1.7" fill="'+col+'" stroke="none" transform="rotate('+(i*15)+' 50 50)"/>';
+        return '<svg class="dv-mandala" viewBox="0 0 100 100" fill="none" stroke="'+col+'" stroke-width="1.2"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="42" opacity=".6"/>'+p+'<circle cx="50" cy="50" r="12"/><circle cx="50" cy="50" r="5" fill="'+col+'"/></svg>';
+      }
+
+      var flowerSvg = (function(){
+        var a="",b="";
+        for(var i=0;i<16;i++) a+='<ellipse cx="50" cy="22" rx="9" ry="19" transform="rotate('+(i*22.5)+' 50 50)"/>';
+        for(var i=0;i<12;i++) b+='<ellipse cx="50" cy="32" rx="7" ry="13" transform="rotate('+(i*30+15)+' 50 50)"/>';
+        return '<svg class="dv-flower" viewBox="0 0 100 100"><g fill="#e8a020" stroke="#b9660f" stroke-width=".8">'+a+'</g><g fill="#f4c13a" stroke="#d98a12" stroke-width=".6">'+b+'</g><circle cx="50" cy="50" r="8" fill="#b9541a"/></svg>';
+      })();
+
+      var telugu = "పుట్టినరోజు శుభాకాంక్షలు";
       var diaryText = "Every page of this diary holds a little piece of you — your laughter, your warmth, your beautiful soul. You make every ordinary day feel magical. ❤️";
       var msgs = [
-        "Thank you for every laugh, every random moment, every memory we share together.",
-        "May this year bring you everything you've been quietly wishing for ✨",
-        "You deserve all the cake, all the flowers, and all the love in the world. 🌹"
+        "Thank you for every laugh, every random moment, every cherished memory we share. 🌸",
+        "May this year bring you everything you've been quietly wishing for. ✨",
+        "You deserve all the sweets, all the flowers, and all the love in the world. 🌹"
       ];
 
-      // 8 half-pages → 4 leaves (front + back each)
+      /* 8 half-pages → 4 leaves */
       var pg = [
-        // Leaf 0 front: cover
-        '<span class="d-script-sm">my</span><b class="d-big-title">Diary</b><small>' + first + '\'s ' + ord(age) + ' birthday</small>',
-        // Leaf 0 back
-        '<div class="d-big">' + age + '</div><p class="d-txt">' + diaryText + '</p>',
-        // Leaf 1 front: polaroid
-        '<div class="d-pol"><span class="d-tape"></span>' + ph(0, 'd-ph') + '<em>my favourite person ♥</em></div>',
-        // Leaf 1 back
-        '<div class="d-mini">' + ph(1) + '</div><p class="d-txt">' + msgs[0] + '</p>',
-        // Leaf 2 front
-        '<p class="d-txt">' + msgs[1] + '</p><div class="d-pol" style="transform:rotate(-3deg)"><span class="d-tape"></span>' + ph(2) + '</div>',
-        // Leaf 2 back
-        '<div class="d-mini">' + ph(3) + '</div><p class="d-txt">' + msgs[2] + '</p>',
-        // Leaf 3 front
-        '<div class="d-big">♥</div><p class="d-txt">happy birthday, ' + first + '!</p><p class="d-txt">' + dateTxt + '</p>',
+        // Leaf 0 front: leather cover
+        orn() + mandala("#e3b955") + '<b>Diary</b><small>' + first + '\'s ' + ord(age) + ' birthday</small>',
+        // Leaf 0 back: age + telugu + message
+        orn() + '<div class="dv-dot"></div><div class="dv-big">' + age + '</div><div class="dv-tel">' + telugu + '</div>' + divider + '<p>' + diaryText + '</p>',
+        // Leaf 1 front: vintage framed photo
+        orn() + '<div class="dv-stamp">' + stamp + '</div><div class="dv-frame lg">' + ph(0) + '</div><p class="dv-cap">my favourite person ♥</p>',
+        // Leaf 1 back: photo + message
+        orn() + '<div class="dv-frame">' + ph(1) + '</div>' + divider + '<p>' + msgs[0] + '</p>',
+        // Leaf 2 front: message + photo
+        orn() + '<p>' + msgs[1] + '</p>' + divider + '<div class="dv-frame lg">' + ph(2) + '</div>',
+        // Leaf 2 back: photo + message
+        orn() + '<div class="dv-frame">' + ph(3) + '</div>' + divider + '<p>' + msgs[2] + '</p>',
+        // Leaf 3 front: flower + closing
+        orn() + flowerSvg + '<p class="dv-cap">Many happy returns of the day, ' + first + '!</p><p>' + dateTxt + '</p>',
         // Leaf 3 back: back cover
-        '<span class="d-script-sm">with love ♥</span>'
+        orn() + mandala("#e3b955") + '<small>with blessings ♥</small>'
       ];
 
       var book = document.getElementById("d-book");
-      // Build spine dots
+      /* spine studs */
       var spine = document.getElementById("d-spine");
-      if (!spine) { spine = document.createElement("div"); spine.className="d-spine"; spine.id="d-spine"; book.appendChild(spine); }
+      if (!spine) { spine = document.createElement("div"); spine.className = "dv-spine"; spine.id = "d-spine"; book.appendChild(spine); }
+      spine.className = "dv-spine";
       spine.innerHTML = "<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>";
 
-      // Build 4 leaves
+      /* build leaves */
       var leafHTML = "";
       for (var i = 0; i < 4; i++) {
         var isCover = i === 0;
         var isBack  = i === 3;
         leafHTML += '<div class="leaf" data-li="' + i + '">'
-          + '<div class="dface front' + (isCover ? " d-cover" : "") + '">' + pg[2*i] + '</div>'
-          + '<div class="dface back'  + (isBack  ? " d-cover" : "") + '">' + pg[2*i+1] + '</div>'
+          + '<div class="dface front' + (isCover ? " dv-cover" : "") + '">' + pg[2*i]   + '</div>'
+          + '<div class="dface back'  + (isBack  ? " dv-cover" : "") + '">' + pg[2*i+1] + '</div>'
           + '</div>';
       }
       book.innerHTML += leafHTML;
 
-      // Page-turn logic
+      /* page-turn logic */
       var leaves = Array.from(book.querySelectorAll(".leaf"));
       var n = leaves.length;
       var cur = 0;
-      leaves.forEach(function(l, i){ l.style.zIndex = n - i; });
+      leaves.forEach(function(l,i){ l.style.zIndex = n-i; });
 
       function update() {
-        leaves.forEach(function(l, i){
+        leaves.forEach(function(l,i){
           var flipped = i < cur;
-          var wasFlipped = l.classList.contains("flipped");
-          if (flipped !== wasFlipped) {
+          var was = l.classList.contains("flipped");
+          if (flipped !== was) {
             l.style.zIndex = 50;
-            setTimeout(function(){ l.style.zIndex = flipped ? i + 1 : n - i; }, 450);
+            setTimeout(function(){ l.style.zIndex = flipped ? i+1 : n-i; }, 450);
           }
           l.classList.toggle("flipped", flipped);
         });
         book.classList.toggle("b-closed", cur === 0);
-        book.classList.toggle("b-end", cur === n);
+        book.classList.toggle("b-end",    cur === n);
         if (cur === n) setTimeout(function(){ toLetter(); }, 900);
         document.getElementById("d-prev").disabled = cur === 0;
         document.getElementById("d-next").disabled = cur === n;
         document.getElementById("d-hint").textContent =
           cur === 0 ? "tap the book to open" :
-          cur === n ? "the end ✦" :
-          "tap to turn the page";
+          cur === n ? "✦ the end ✦" : "tap to turn the page";
       }
 
-      leaves.forEach(function(l, i){
-        l.onclick = function(){
-          cur = l.classList.contains("flipped") ? i : i + 1;
-          update();
-        };
+      leaves.forEach(function(l,i){
+        l.onclick = function(){ cur = l.classList.contains("flipped") ? i : i+1; update(); };
       });
       document.getElementById("d-next").onclick = function(){ if(cur < n){ cur++; update(); } };
       document.getElementById("d-prev").onclick = function(){ if(cur > 0){ cur--; update(); } };
       update();
 
-      // Add stars to diary screen
       buildStarsFor("st-diary");
     }
 

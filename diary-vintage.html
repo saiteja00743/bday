@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diary</title>
+<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Kalam:wght@400;700&family=Noto+Serif+Telugu:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--maroon:#6b1a1a;--deep:#4a1010;--gold:#e3b955;--brass:#9a6b2a;--parch:#ecd9ae;--ink:#3a2412;--kum:#b3261e;--saff:#e8a020}
+*{box-sizing:border-box;margin:0}
+body{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px 12px;overflow-x:hidden;font-family:Georgia,serif;
+ background:radial-gradient(circle at 50% 40%,#6b1a1a,#2a0808 85%)}
+
+/* marigold garland */
+.garland{width:min(700px,100%);height:40px;position:relative;margin-bottom:6px;
+ background:radial-gradient(circle at 14px 18px,var(--saff) 0 7px,#c46a10 8px 9px,transparent 10px) 0 0/28px 40px repeat-x}
+.garland::before{content:"";position:absolute;left:0;right:0;top:6px;height:2px;background:var(--brass)}
+
+.dwrap{width:100%;display:flex;flex-direction:column;align-items:center;gap:14px}
+.book3d{container-type:inline-size;position:relative;width:min(700px,100%);aspect-ratio:3/2;perspective:2000px;transition:transform .9s cubic-bezier(.5,0,.2,1)}
+.book3d.closed{transform:translateX(-25%)}.book3d.end{transform:translateX(25%)}
+.leaf{position:absolute;left:50%;top:0;width:50%;height:100%;transform-origin:left center;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.5,0,.2,1);cursor:pointer}
+.leaf.flipped{transform:rotateY(-180deg)}
+
+/* aged paper */
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3%;padding:10% 11%;overflow:hidden;color:var(--ink);
+ background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .28 0 0 0 0 .1 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+  radial-gradient(ellipse at 25% 15%,#f6e9c9,transparent 60%),radial-gradient(circle at 85% 90%,#cfa86a66,transparent 55%),var(--parch)}
+.face.front{border-radius:0 8px 8px 0;box-shadow:inset 14px 0 16px -12px #0007,inset 0 0 44px #8a5a2a66}
+.face.back{transform:rotateY(180deg);border-radius:8px 0 0 8px;box-shadow:inset -14px 0 16px -12px #0007,inset 0 0 44px #8a5a2a66}
+.face::before{content:"";position:absolute;inset:4%;border:3px double var(--brass);pointer-events:none}
+
+/* leather cover */
+.face.cover{color:var(--gold);
+ background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.7' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .3 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"),
+  radial-gradient(circle at 50% 40%,#7d2222,var(--deep) 85%)}
+.face.cover::before{border:2px solid var(--gold);box-shadow:0 0 0 5px var(--deep),0 0 0 6.5px var(--gold)}
+.face.cover b{font:400 clamp(2rem,12cqw,5.2rem)/1 'Rozha One',serif;color:var(--gold);text-shadow:0 2px 0 #0008}
+.face.cover small{font:400 clamp(.8rem,3.2cqw,1.4rem) 'Kalam',cursive;color:#f0d38a}
+.mandala{width:46%;flex:none}
+
+/* corner ornaments */
+.crn{position:absolute;width:11%;aspect-ratio:1;color:var(--brass);pointer-events:none;z-index:2}
+.crn svg{width:100%;height:100%;display:block}
+.cover .crn{color:var(--gold)}
+.crn.tl{top:2.8%;left:2.8%}.crn.tr{top:2.8%;right:2.8%;transform:scaleX(-1)}
+.crn.bl{bottom:2.8%;left:2.8%;transform:scaleY(-1)}.crn.br{bottom:2.8%;right:2.8%;transform:scale(-1)}
+
+/* text */
+.face p{font:400 clamp(11px,3cqw,19px)/1.35 'Kalam',cursive;position:relative}
+.face p.cap{font-weight:700;color:var(--maroon)}
+.big{font:400 clamp(2.4rem,11cqw,6rem)/1 'Rozha One',serif;color:var(--maroon)}
+.dot{width:clamp(8px,2.4cqw,15px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e0483c,var(--kum));box-shadow:0 0 0 2px #b3261e44}
+.tel{font:700 clamp(11px,3.2cqw,20px)/1.3 'Noto Serif Telugu',serif;color:var(--kum)}
+.div{width:46%;color:var(--brass);flex:none}
+.flower{width:40%;flex:none}
+
+/* sepia photo with vintage corners */
+.ph{background:var(--img) center/cover no-repeat,linear-gradient(135deg,#d9b98a,#a8794a);position:relative;width:100%;height:100%;filter:sepia(.55) contrast(1.05)}
+.ph::after{content:"✿";position:absolute;inset:0;display:grid;place-items:center;color:#fff8;font-size:2rem;z-index:-1}
+.frame{width:76%;flex:1;min-height:0;display:flex;background:#f7ecd2;padding:6px;box-shadow:0 2px 7px #0006;transform:rotate(-1.5deg);position:relative}
+.frame.lg{width:70%;transform:rotate(1.5deg)}
+.frame .ph{flex:1;height:auto}
+.frame::before,.frame::after{content:"";position:absolute;border:11px solid;z-index:3}
+.frame::before{top:0;left:0;border-color:#7a4a22 transparent transparent #7a4a22}
+.frame::after{bottom:0;right:0;border-color:transparent #7a4a22 #7a4a22 transparent}
+.stamp{position:absolute;top:7%;right:9%;z-index:3;border:2px solid var(--kum);color:var(--kum);font:700 clamp(7px,1.9cqw,12px) 'Kalam',cursive;padding:1px 6px;border-radius:4px;transform:rotate(9deg);opacity:.75;letter-spacing:.06em}
+
+/* brass studs on the spine */
+.spine{position:absolute;left:50%;top:8%;bottom:8%;width:16px;transform:translateX(-50%);display:flex;flex-direction:column;justify-content:space-between;z-index:300;pointer-events:none;transition:opacity .4s}
+.spine i{height:12px;width:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9a8,#b98a2e 60%,#6a4812)}
+.book3d.closed .spine,.book3d.end .spine{opacity:0}
+
+.dctl{display:flex;gap:12px;align-items:center;color:var(--gold);font:400 1.1rem 'Kalam',cursive}
+.dctl button{font:700 1.2rem 'Kalam',cursive;color:var(--deep);background:var(--gold);border:2px solid var(--brass);border-radius:99px;padding:0 18px;cursor:pointer}
+.dctl button:disabled{opacity:.4;cursor:default}
+button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+@media(max-width:640px){.book3d{aspect-ratio:5/4}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="dwrap" id="diary"></div>
+<script>
+/* ============ EDIT ONLY THIS BLOCK ============ */
+const CONFIG = {
+  name: "Kayla Varshini",
+  dob: "2005-11-28",                       // YYYY-MM-DD
+  from: "",                                // optional: your name
+  telugu: "పుట్టినరోజు శుభాకాంక్షలు",        // "Happy birthday" in Telugu, change or clear if you like
+  photos: ["photos/1.jpg","photos/2.jpg","photos/3.jpg","photos/4.jpg"],
+  diary: "Happy birthday! Another year of you making the world a little brighter. I hope today feels as special as you are.",
+  diaryCaption: "my favourite person",
+  messages: [
+    "Thank you for every laugh, every random call, every little memory.",
+    "May this year bring you everything you’ve been quietly wishing for.",
+    "You deserve sweets, flowers and the best day ever."
+  ]
+};
+/* ================================================ */
+const $ = s => document.querySelector(s);
+const C = CONFIG, first = C.name.split(" ")[0];
+const dob = new Date(C.dob), now = new Date();
+const age = now.getFullYear() - dob.getFullYear();
+const dateTxt = dob.toLocaleDateString("en-GB",{day:"numeric",month:"long"});
+const stamp = dob.toLocaleDateString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric"}).replace(/\//g," · ");
+const ph = i => `<div class="ph" style="--img:url('${C.photos[i % C.photos.length]}')"></div>`;
+const ord = n => { const t=["th","st","nd","rd"], v=n%100; return n+(t[(v-20)%10]||t[v]||t[0]); };
+const m = i => C.messages[i] || "";
+
+/* ornaments (inline SVG) */
+const cornerSvg = `<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 37V12Q3 3 12 3h25"/><path d="M9 31V14Q9 9 14 9h17" opacity=".6"/><circle cx="16" cy="16" r="3.2" fill="currentColor" stroke="none"/><path d="M20 10q5 1 7-4M10 20q1 5-4 7"/></svg>`;
+const orn = () => ["tl","tr","bl","br"].map(c=>`<span class="crn ${c}">${cornerSvg}</span>`).join("");
+const divider = `<svg class="div" viewBox="0 0 120 12" fill="currentColor"><path d="M0 6h46M74 6h46" stroke="currentColor" fill="none"/><circle cx="60" cy="6" r="3.2"/><circle cx="51" cy="6" r="1.6"/><circle cx="69" cy="6" r="1.6"/></svg>`;
+const mandala = col => {
+  let p = "";
+  for (let i=0;i<12;i++) p += `<ellipse cx="50" cy="24" rx="7" ry="15" transform="rotate(${i*30} 50 50)"/>`;
+  for (let i=0;i<24;i++) p += `<circle cx="50" cy="9" r="1.7" fill="${col}" stroke="none" transform="rotate(${i*15} 50 50)"/>`;
+  return `<svg class="mandala" viewBox="0 0 100 100" fill="none" stroke="${col}" stroke-width="1.2"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="42" opacity=".6"/>${p}<circle cx="50" cy="50" r="12"/><circle cx="50" cy="50" r="5" fill="${col}"/></svg>`;
+};
+const flower = (() => {
+  let a = "", b = "";
+  for (let i=0;i<16;i++) a += `<ellipse cx="50" cy="22" rx="9" ry="19" transform="rotate(${i*22.5} 50 50)"/>`;
+  for (let i=0;i<12;i++) b += `<ellipse cx="50" cy="32" rx="7" ry="13" transform="rotate(${i*30+15} 50 50)"/>`;
+  return `<svg class="flower" viewBox="0 0 100 100"><g fill="#e8a020" stroke="#b9660f" stroke-width=".8">${a}</g><g fill="#f4c13a" stroke="#d98a12" stroke-width=".6">${b}</g><circle cx="50" cy="50" r="8" fill="#b9541a"/></svg>`;
+})();
+
+const pg = [
+ `${orn()}${mandala("#e3b955")}<b>Diary</b><small>${first}’s ${ord(age)} birthday</small>`,
+ `${orn()}<div class="dot"></div><div class="big">${age}</div>${C.telugu?`<div class="tel">${C.telugu}</div>`:""}${divider}<p>${C.diary}</p>${C.from?`<p>— ${C.from}</p>`:""}`,
+ `${orn()}<div class="stamp">${stamp}</div><div class="frame lg">${ph(0)}</div><p class="cap">${C.diaryCaption}</p>`,
+ `${orn()}<div class="frame">${ph(1)}</div>${divider}<p>${m(0)}</p>`,
+ `${orn()}<p>${m(1)}</p>${divider}<div class="frame lg">${ph(2)}</div>`,
+ `${orn()}<div class="frame">${ph(3)}</div>${divider}<p>${m(2)}</p>`,
+ `${orn()}${flower}<p class="cap">Many happy returns of the day, ${first}!</p><p>${dateTxt}</p>`,
+ `${orn()}${mandala("#e3b955")}<small>with blessings</small>`
+];
+const leaves = [0,1,2,3].map(i=>`<div class="leaf"><div class="face front${i==0?" cover":""}">${pg[2*i]}</div><div class="face back${i==3?" cover":""}">${pg[2*i+1]}</div></div>`).join("");
+
+$("#diary").innerHTML = `<div class="garland"></div><div class="book3d closed" id="book"><div class="spine">${"<i></i>".repeat(8)}</div>${leaves}</div><div class="dctl"><button id="prev" aria-label="Previous page">‹</button><span id="dhint"></span><button id="next" aria-label="Next page">›</button></div>`;
+
+/* page turning */
+(function(){
+  const book=$("#book"), L=[...book.querySelectorAll(".leaf")], n=L.length; let cur=0;
+  L.forEach((l,i)=>l.style.zIndex=n-i);
+  const up=()=>{
+    L.forEach((l,i)=>{const f=i<cur; if(f!==l.classList.contains("flipped")){l.style.zIndex=50;setTimeout(()=>l.style.zIndex=f?i+1:n-i,450)} l.classList.toggle("flipped",f)});
+    book.classList.toggle("closed",cur===0); book.classList.toggle("end",cur===n);
+    $("#prev").disabled=cur===0; $("#next").disabled=cur===n;
+    $("#dhint").textContent=cur===0?"tap the book to open":cur===n?"the end":"tap to turn the page";
+  };
+  L.forEach((l,i)=>l.onclick=()=>{cur=l.classList.contains("flipped")?i:i+1;up()});
+  $("#next").onclick=()=>{if(cur<n){cur++;up()}};
+  $("#prev").onclick=()=>{if(cur>0){cur--;up()}};
+  up();
+})();
+</script>
+</body>
+</html>
