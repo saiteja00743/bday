@@ -615,12 +615,25 @@
       margin-bottom: 10px
     }
 
+    .panda-circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(200, 16, 46, .5);
+      box-shadow: 0 0 40px rgba(200, 16, 46, .4), 0 0 80px rgba(200, 16, 46, .2);
+      position: relative;
+      z-index: 1
+    }
+
     .panda-glow {
       position: absolute;
       inset: -20px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(200, 16, 46, .3), transparent 70%);
-      animation: pglow 2s ease-in-out infinite
+      animation: pglow 2s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 2
     }
 
     .panda-emoji {
@@ -634,6 +647,14 @@
       z-index: 1;
       animation: pbob 2s ease-in-out infinite;
       filter: drop-shadow(0 10px 30px rgba(200, 16, 46, .4))
+    }
+
+    .panda-video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      position: relative; z-index: 1
     }
 
     @keyframes pbob {
@@ -727,14 +748,22 @@
       height: 130px;
       border-radius: 50%;
       background: rgba(5, 0, 3, .4);
-      border: 1.5px solid rgba(200, 16, 46, .4);
+      border: 2px solid rgba(200, 16, 46, .5);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 70px;
       margin-bottom: 28px;
+      overflow: hidden;
       animation: pbob 2.5s ease-in-out infinite;
-      box-shadow: 0 0 40px rgba(200, 16, 46, .3), inset 0 0 20px rgba(200, 16, 46, .08)
+      box-shadow: 0 0 40px rgba(200, 16, 46, .4), inset 0 0 20px rgba(200, 16, 46, .08)
+    }
+
+    .sp-panda video, .count-panda video {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block
     }
 
     .sp-heading {
@@ -795,13 +824,15 @@
       height: 120px;
       border-radius: 50%;
       background: rgba(5, 0, 3, .3);
-      border: 1.5px solid rgba(200, 16, 46, .4);
+      border: 2px solid rgba(200, 16, 46, .5);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 60px;
       margin-bottom: 24px;
-      box-shadow: 0 0 40px rgba(200, 16, 46, .3)
+      overflow: hidden;
+      animation: pbob 2.5s ease-in-out infinite;
+      box-shadow: 0 0 40px rgba(200, 16, 46, .4)
     }
 
     .count-h {
@@ -1601,7 +1632,9 @@
     <div class="content">
       <div class="panda-wrap">
         <div class="panda-glow"></div>
-        <div class="panda-emoji">🐼</div>
+        <div class="panda-circle">
+          <video id="vid-load" src="1.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video>
+        </div>
         <div class="hmm-bubble">Hmm...</div>
       </div>
       <h2 class="load-heading">Loading something<br>special...</h2>
@@ -1617,7 +1650,7 @@
     <div class="screen-bg bg-special"></div>
     <div class="stars-wrap" id="st-special"></div>
     <div class="content">
-      <div class="sp-panda">🐼</div>
+      <div class="sp-panda"><video id="vid-special" src="2.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></video></div>
       <h2 class="sp-heading">It's Your<br><span>Special Day</span> 🌸</h2>
       <p class="sp-sub">I made something special for you...</p>
       <button class="btn-prim" onclick="toBirthday()">START &nbsp;🌹</button>
@@ -1629,7 +1662,7 @@
     <div class="screen-bg bg-bday"></div>
     <div class="stars-wrap" id="st-count"></div>
     <div class="content">
-      <div class="count-panda">🐻</div>
+      <div class="count-panda"><video id="vid-count" src="2.mp4" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></video></div>
       <h2 class="count-h">Happy Birthday<br><span id="count-name">My Girl</span> 🎀</h2>
       <p class="count-lbl">You have completed</p>
       <div class="count-grid">
@@ -2006,6 +2039,12 @@
       document.querySelectorAll(".screen").forEach(function (s) { s.classList.remove("active"); });
       var el = document.getElementById(id); if (el) el.classList.add("active");
       curScreen = id;
+      /* ensure videos play when their screen activates (mobile autoplay policy) */
+      var vidMap = { "s-load": "vid-load", "s-special": "vid-special", "s-count": "vid-count" };
+      if (vidMap[id]) {
+        var v = document.getElementById(vidMap[id]);
+        if (v) { v.currentTime = 0; v.play().catch(function(){}); }
+      }
     }
 
     function toPasscode() {
