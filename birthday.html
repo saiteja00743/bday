@@ -1050,7 +1050,7 @@
       border-radius: 2px
     }
 
-    /* Gallery */
+    /* Gallery — Infinite Zoom Viewer */
     .gallery-h {
       font-family: var(--fs);
       font-style: italic;
@@ -1066,97 +1066,87 @@
       font-style: italic;
       font-size: 13px;
       color: rgba(255, 255, 255, .4);
-      margin-bottom: 20px
+      margin-bottom: 12px
     }
 
-    .gal-wrap {
-      width: 100%;
-      overflow: hidden;
+    /* zoom stage — full-width, fixed height */
+    #gal-stage {
       position: relative;
-      margin-bottom: 16px;
-      border-radius: 20px
-    }
-
-    .gal-slider {
-      display: flex;
-      transition: transform .4s var(--ease);
-      will-change: transform
-    }
-
-    .gal-slide {
-      min-width: 100%;
+      width: 100%;
+      height: clamp(320px, 52vh, 480px);
+      overflow: hidden;
       border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid rgba(200, 16, 46, .25);
-      box-shadow: 0 0 40px rgba(200, 16, 46, .2);
-      position: relative;
+      border: 1px solid rgba(200,16,46,.25);
+      box-shadow: 0 0 40px rgba(200,16,46,.2);
+      margin-bottom: 16px;
+      background: radial-gradient(circle at 50% 40%, #1d0a0a, #0d0005 70%)
     }
 
-    .gal-slide img,
-    .photo-ph {
-      width: 100%;
-      height: clamp(300px, 45vh, 400px);
-      object-fit: cover;
-      display: block;
-    }
-
-    .gal-caption {
+    .gz-f {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      left: 50%; top: 50%;
+      background-size: cover;
+      background-position: center;
+      will-change: transform;
+      box-shadow: 0 0 6vmin rgba(0,0,0,.55);
+      backface-visibility: hidden
+    }
+    .gz-f i {
+      position: absolute;
+      inset: 0;
+      background: #05000a;
+      opacity: 0;
+      border-radius: inherit
+    }
+
+    /* caption bar */
+    .gz-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
       padding: 24px 16px 14px;
-      background: linear-gradient(to top, rgba(0, 0, 0, .88) 0%, rgba(0, 0, 0, .45) 60%, transparent 100%);
+      background: linear-gradient(to top, rgba(0,0,0,.88) 0%, rgba(0,0,0,.45) 60%, transparent 100%);
       font-family: var(--fs);
       font-style: italic;
       font-size: 15px;
-      color: rgba(255, 255, 255, .95);
+      color: rgba(255,255,255,.95);
       text-align: center;
       letter-spacing: .04em;
       pointer-events: none;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+      transition: opacity .4s;
+      z-index: 10
     }
 
-    .photo-ph {
-      background: linear-gradient(135deg, #1a0008, #0d0005);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 12px;
-      font-size: 48px;
-      color: rgba(200, 16, 46, .4)
+    /* pause/play pill */
+    #gz-play {
+      position: absolute;
+      right: 10px; top: 10px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(227,185,85,.7);
+      background: rgba(13,0,8,.55);
+      color: rgba(255,255,255,.9);
+      font-size: 13px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      z-index: 11;
+      touch-action: manipulation
     }
 
-    .photo-ph p {
+    /* scroll/swipe hint fades out */
+    #gz-hint {
+      position: absolute;
+      bottom: 44px; left: 0; right: 0;
+      text-align: center;
       font-family: var(--fs);
       font-style: italic;
-      font-size: 14px;
-      color: rgba(255, 255, 255, .3);
-      letter-spacing: .08em
+      font-size: 12px;
+      color: rgba(255,255,255,.45);
+      pointer-events: none;
+      transition: opacity .8s;
+      z-index: 10
     }
-
-    .gal-dots {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 28px
-    }
-
-    .g-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: rgba(200, 16, 46, .3);
-      transition: all .3s;
-      cursor: pointer
-    }
-
-    .g-dot.active {
-      background: var(--cr);
-      transform: scale(1.3);
-      box-shadow: 0 0 8px rgba(200, 16, 46, .6)
-    }
+    #gz-hint.gone { opacity: 0 }
 
     .btn-gift {
       background: rgba(200, 16, 46, .9);
@@ -1175,15 +1165,8 @@
     }
 
     @keyframes gpulse {
-
-      0%,
-      100% {
-        box-shadow: 0 0 30px rgba(200, 16, 46, .5), 0 4px 20px rgba(200, 16, 46, .4)
-      }
-
-      50% {
-        box-shadow: 0 0 50px rgba(200, 16, 46, .8), 0 4px 30px rgba(200, 16, 46, .6)
-      }
+      0%, 100% { box-shadow: 0 0 30px rgba(200, 16, 46, .5), 0 4px 20px rgba(200, 16, 46, .4) }
+      50%       { box-shadow: 0 0 50px rgba(200, 16, 46, .8), 0 4px 30px rgba(200, 16, 46, .6) }
     }
 
     /* ── SCREEN 7: LETTER (SCROLL) ── */
@@ -2115,29 +2098,13 @@
           love, and magic you deserve, beautiful soul.</p>
       </div>
       <h2 class="gallery-h">Special Memories</h2>
-      <p class="gallery-sub">Swipe for more ✦</p>
-      <div class="gal-wrap" id="gal-wrap">
-        <div class="gal-slider" id="gal-slider">
-          <!-- REPLACE: swap photo-ph divs with <img src="..."> -->
-          <div class="gal-slide">
-            <div class="photo-ph">🌹<p>Photo 1 — Add your memory</p>
-            </div>
-          </div>
-          <div class="gal-slide">
-            <div class="photo-ph">💫<p>Photo 2 — A moment to remember</p>
-            </div>
-          </div>
-          <div class="gal-slide">
-            <div class="photo-ph">🎀<p>Photo 3 — Another beautiful day</p>
-            </div>
-          </div>
-          <div class="gal-slide">
-            <div class="photo-ph">🌸<p>Photo 4 — So many memories</p>
-            </div>
-          </div>
-        </div>
+      <p class="gallery-sub">Swipe or scroll to zoom ✦</p>
+      <div id="gal-stage">
+        <!-- frames injected by JS -->
+        <div id="gz-hint">Scroll · Swipe · Auto-zooming</div>
+        <div class="gz-caption" id="gz-caption"></div>
+        <button id="gz-play" aria-label="Pause or play zoom">❚❚</button>
       </div>
-      <div class="gal-dots" id="gal-dots"></div>
       <button class="btn-gift" onclick="toDiary()">Open Your Special Gift 🎁</button>
     </div>
   </div>
@@ -2391,69 +2358,129 @@
     }
 
     /* ══════════════════════════════════════
-       GALLERY
+       GALLERY — INFINITE ZOOM VIEWER
     ══════════════════════════════════════ */
-    function buildGallery() {
-      if (CFG.photos && CFG.photos.length) {
-        var sl = document.getElementById("gal-slider"); sl.innerHTML = "";
-        CFG.photos.forEach(function (item, i) {
-          var url = typeof item === "string" ? item : item.url;
-          var caption = typeof item === "object" ? item.caption : ("Memory " + (i + 1));
-          var slide = document.createElement("div");
-          slide.className = "gal-slide";
+    var gzFrames = [], gzFw = 0, gzFh = 0, gzCur = 0, gzTgt = 0, gzAuto = true;
+    var gzLast = performance.now(), gzRaf = null, gzBuilt = false;
+    var GZ_R = 4, GZ_N = 3;
+    /* nested offsets: where each child photo appears inside its parent */
+    var GZ_P = [[-.18, -.22], [-.18, -.20], [.18, -.25]];
+    var GZ_M = [-1, 0, 1, 2];
 
-          var img = document.createElement("img");
-          img.src = url;
-          img.alt = caption;
-          img.loading = "lazy";
-          img.onerror = function () {
-            var ph = document.createElement("div"); ph.className = "photo-ph";
-            ph.innerHTML = "🌹<p>" + caption + "</p>";
-            this.parentNode.replaceChild(ph, this);
-          };
-          slide.appendChild(img);
-
-          if (caption) {
-            var cap = document.createElement("div");
-            cap.className = "gal-caption";
-            cap.textContent = caption;
-            slide.appendChild(cap);
-          }
-          sl.appendChild(slide);
-        });
-      }
-      var slider = document.getElementById("gal-slider");
-      gCount = slider ? slider.children.length : 0;
-      var wrap = document.getElementById("gal-dots"); if (!wrap) return;
-      wrap.innerHTML = "";
-      for (var i = 0; i < gCount; i++) {
-        var d = document.createElement("div");
-        d.className = "g-dot" + (i === 0 ? " active" : "");
-        (function (idx) { d.onclick = function () { goSlide(idx); }; })(i);
-        wrap.appendChild(d);
-      }
+    function gzPhotoUrl(k) {
+      var list = CFG.photos || [];
+      if (!list.length) return "";
+      var p = list[((k % list.length) + list.length) % list.length];
+      return typeof p === "string" ? p : p.url;
     }
-
-    function goSlide(i) {
-      gIdx = Math.max(0, Math.min(i, gCount - 1));
-      var sl = document.getElementById("gal-slider");
-      if (sl) sl.style.transform = "translateX(-" + gIdx * 100 + "%)";
-      document.querySelectorAll(".g-dot").forEach(function (d, j) { d.classList.toggle("active", j === gIdx); });
+    function gzCaption(k) {
+      var list = CFG.photos || [];
+      if (!list.length) return "";
+      var p = list[((k % list.length) + list.length) % list.length];
+      return (typeof p === "object" && p.caption) ? p.caption : "";
     }
+    function gzMod(a) { return ((a % GZ_N) + GZ_N) % GZ_N; }
 
-    function initSwipe() {
-      var gw = document.getElementById("gal-wrap"); if (!gw) return;
-      gw.addEventListener("touchstart", function (e) { gSX = e.touches[0].clientX; gDrag = true; }, { passive: true });
-      gw.addEventListener("touchend", function (e) {
-        if (!gDrag) return; var d = gSX - e.changedTouches[0].clientX;
-        if (Math.abs(d) > 40) { sfx("sparkle"); goSlide(d > 0 ? gIdx + 1 : gIdx - 1); } gDrag = false;
-      });
-      gw.addEventListener("mousedown", function (e) { gSX = e.clientX; gDrag = true; });
-      gw.addEventListener("mouseup", function (e) {
-        if (!gDrag) return; var d = gSX - e.clientX;
-        if (Math.abs(d) > 40) { sfx("sparkle"); goSlide(d > 0 ? gIdx + 1 : gIdx - 1); } gDrag = false;
+    function gzSize() {
+      var stage = document.getElementById("gal-stage"); if (!stage) return;
+      gzFh = stage.offsetHeight; gzFw = gzFh * 0.75;
+      gzFrames.forEach(function(d) {
+        d.style.width  = gzFw + "px";
+        d.style.height = gzFh + "px";
+        d.style.marginLeft = (-gzFw / 2) + "px";
+        d.style.marginTop  = (-gzFh / 2) + "px";
+        d.style.borderRadius = (gzFw * 0.045) + "px";
+        d.style.border = Math.max(gzFw * 0.006, 1) + "px solid rgba(200,16,46,.6)";
       });
     }
+
+    function gzRender(t) {
+      if (!gzFrames.length || !gzFw) return;
+      var i = Math.floor(t), f = t - i;
+      var z = Math.pow(GZ_R, f);
+      var C = {}; C[0] = [0, 0];
+      for (var m = 0; m <= 2; m++) {
+        var sc = Math.pow(GZ_R, -m), off = GZ_P[gzMod(i + m)];
+        C[m + 1] = [C[m][0] + sc * off[0] * gzFw, C[m][1] + sc * off[1] * gzFh];
+      }
+      var o1 = GZ_P[gzMod(i - 1)];
+      C[-1] = [-GZ_R * o1[0] * gzFw, -GZ_R * o1[1] * gzFh];
+      var cx = f * C[1][0], cy = f * C[1][1];
+
+      GZ_M.forEach(function(m, k) {
+        var d = gzFrames[k], sc = Math.pow(GZ_R, -m) * z;
+        d.style.transform = "translate(" + ((C[m][0] - cx) * z) + "px," + ((C[m][1] - cy) * z) + "px) scale(" + sc + ")";
+        var url = gzPhotoUrl(i + m);
+        d.style.backgroundImage = url ? "url('" + url + "')" : "none";
+        d.style.zIndex = m + 2;
+        d.style.opacity = m === 2 ? f : 1;
+        d.firstChild.style.opacity = m === -1 ? 0.5 : m === 0 ? 0.5 * f : 0;
+      });
+
+      /* update caption for the front photo */
+      var cap = document.getElementById("gz-caption");
+      if (cap) cap.textContent = gzCaption(i + 1) || gzCaption(i);
+    }
+
+    function gzTick(now) {
+      var dt = Math.min((now - gzLast) / 1000, 0.05); gzLast = now;
+      if (gzAuto) gzTgt += dt * 0.07;
+      gzCur += (gzTgt - gzCur) * Math.min(1, dt * 6);
+      gzRender(gzCur);
+      gzRaf = requestAnimationFrame(gzTick);
+    }
+
+    function gzBuild() {
+      var stage = document.getElementById("gal-stage"); if (!stage || gzBuilt) return;
+      gzBuilt = true; gzFrames = [];
+      GZ_M.forEach(function() {
+        var d = document.createElement("div"); d.className = "gz-f";
+        d.innerHTML = "<i></i>";
+        stage.insertBefore(d, stage.firstChild);
+        gzFrames.push(d);
+      });
+      gzSize(); gzRender(0);
+
+      /* wheel */
+      stage.addEventListener("wheel", function(e) {
+        e.preventDefault(); gzTgt += e.deltaY * 0.0009;
+        document.getElementById("gz-hint").classList.add("gone");
+      }, { passive: false });
+
+      /* touch */
+      var gy0 = null;
+      stage.addEventListener("touchstart", function(e) { gy0 = e.touches[0].clientY; }, { passive: true });
+      stage.addEventListener("touchmove", function(e) {
+        if (gy0 === null) return;
+        gzTgt += (gy0 - e.touches[0].clientY) * 0.004; gy0 = e.touches[0].clientY;
+        document.getElementById("gz-hint").classList.add("gone");
+        e.stopPropagation();
+      }, { passive: true });
+      stage.addEventListener("touchend", function() { gy0 = null; });
+
+      /* pause/play button */
+      var btn = document.getElementById("gz-play");
+      if (btn) btn.addEventListener("click", function() {
+        gzAuto = !gzAuto; btn.textContent = gzAuto ? "❚❚" : "▶";
+      });
+    }
+
+    function gzStart() {
+      gzBuild();
+      if (!gzRaf) { gzLast = performance.now(); gzRaf = requestAnimationFrame(gzTick); }
+      /* reset hint */
+      var h = document.getElementById("gz-hint"); if (h) h.classList.remove("gone");
+    }
+    window.addEventListener("resize", function() {
+      var sc = document.getElementById("s-bday");
+      if (sc && sc.classList.contains("active")) { gzSize(); gzRender(gzCur); }
+    });
+    function gzStop() {
+      if (gzRaf) { cancelAnimationFrame(gzRaf); gzRaf = null; }
+    }
+
+    function buildGallery() { gzBuild(); }
+    function initSwipe() { /* handled inside gzBuild */ }
 
     /* ══════════════════════════════════════
        SCREEN NAVIGATION
@@ -2512,9 +2539,10 @@
       setTimeout(function () { sfx("fanfare"); toCake(); }, 5500);
     }
 
-    function toMemories() { sfx("whoosh"); showScreen("s-bday"); startHearts(); }
+    function toMemories() { sfx("whoosh"); showScreen("s-bday"); startHearts(); gzStart(); }
 
     function toDiary() {
+      gzStop();
       sfx("gift");
       showScreen("s-diary");
       buildDiary();
