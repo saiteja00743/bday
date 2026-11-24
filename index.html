@@ -1622,7 +1622,7 @@
     ══════════════════════════════════════ */
     var CFG = {
       name: "Kayala Varshini",        // ← her name
-      passcode: "2811",               // ← 4-digit secret code (Birthday: 28/11 or 2005)
+      passcode: "2005",               // ← 4-digit secret code
       profilePic: "profile.jpg",      // ← photo URL
       emoji: "🌸",                    // ← placeholder emoji
       birthday: "2005-11-28",         // ← YYYY-MM-DD
@@ -1636,7 +1636,7 @@
         { url: "8.jpg", caption: "Peaceful vibes by the lake 🌊✨" },
         { url: "2.jpeg", caption: "A true masterpiece, just like you 🎨❤️" }
       ],
-      musicUrl: "",                   // ← mp3 URL
+      musicUrl: "vasanthalu .mp3",   // ← background music (plays after unlock)
       showNums: false,                // ← true=show digits, false=show dots
     };
 
@@ -1845,6 +1845,15 @@
     function toLock() { resetCode(); showScreen("s-lock"); }
 
     function toLoading() {
+      // 🎵 Start music on unlock
+      var au = document.getElementById("bg-music");
+      var btn = document.getElementById("music-btn");
+      if (au && au.src && !musicOn) {
+        au.play().then(function() {
+          musicOn = true;
+          if (btn) btn.textContent = "🎵";
+        }).catch(function() {});
+      }
       showScreen("s-load");
       var bar = document.getElementById("prog"); if (!bar) return;
       bar.style.width = "0%";
@@ -1931,7 +1940,7 @@
 
     function checkCode() {
       var pd = document.getElementById("pass-display");
-      var isCorrect = (code === CFG.passcode || code === "2811" || code === "2005" || code === "2024");
+      var isCorrect = (code === CFG.passcode || code === "2005" || code === "2811" || code === "2024");
       if (isCorrect) {
         // ✅ Correct
         var fl = document.createElement("div"); fl.className = "success-flash";
