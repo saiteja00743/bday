@@ -2430,31 +2430,40 @@
     }
 
     function goSlide(i) {
-      gIdx = Math.max(0, Math.min(i, gCount - 1));
+      if (gCount === 0) return;
+      gIdx = ((i % gCount) + gCount) % gCount;   /* loop around */
       var sl = document.getElementById("gal-slider");
       if (sl) sl.style.transform = "translateX(-" + gIdx * 100 + "%)";
       document.querySelectorAll(".g-dot").forEach(function (d, j) { d.classList.toggle("active", j === gIdx); });
     }
 
+    var galTimer = null;
+    function galAutoStart() {
+      galAutoStop();
+      galTimer = setInterval(function() { goSlide(gIdx + 1); }, 3000);
+    }
+    function galAutoStop() {
+      if (galTimer) { clearInterval(galTimer); galTimer = null; }
+    }
+
     function initSwipe() {
       var gw = document.getElementById("gal-wrap"); if (!gw) return;
       var sl = document.getElementById("gal-slider"); if (!sl) return;
-      var startX = 0, startY = 0, isDragging = false, moved = false;
+      var startX = 0, startY = 0, isDragging = false;
 
       gw.addEventListener("touchstart", function(e) {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
-        isDragging = true; moved = false;
+        isDragging = true;
+        galAutoStop(); /* pause auto on touch */
       }, { passive: true });
 
       gw.addEventListener("touchmove", function(e) {
         if (!isDragging) return;
         var dx = e.touches[0].clientX - startX;
         var dy = e.touches[0].clientY - startY;
-        if (!moved && Math.abs(dx) > Math.abs(dy) + 5) {
-          moved = true;
-        }
-        if (moved) {
+        /* only hijack if horizontal swipe dominates */
+        if (Math.abs(dx) > Math.abs(dy)) {
           e.preventDefault();
           sl.style.transition = "none";
           sl.style.transform = "translateX(calc(-" + gIdx * 100 + "% + " + dx + "px))";
@@ -2465,14 +2474,12 @@
         if (!isDragging) return; isDragging = false;
         sl.style.transition = "";
         var dx = e.changedTouches[0].clientX - startX;
-        if (Math.abs(dx) > 40) {
-          sfx("sparkle"); goSlide(dx > 0 ? gIdx - 1 : gIdx + 1);
-        } else {
-          goSlide(gIdx); /* snap back */
-        }
+        if (Math.abs(dx) > 30) { goSlide(dx > 0 ? gIdx - 1 : gIdx + 1); }
+        else { goSlide(gIdx); }
+        galAutoStart();
       }, { passive: true });
 
-      gw.addEventListener("mousedown", function(e) { startX = e.clientX; isDragging = true; moved = false; });
+      gw.addEventListener("mousedown", function(e) { startX = e.clientX; isDragging = true; galAutoStop(); });
       gw.addEventListener("mousemove", function(e) {
         if (!isDragging) return;
         sl.style.transition = "none";
@@ -2482,15 +2489,16 @@
         if (!isDragging) return; isDragging = false;
         sl.style.transition = "";
         var dx = e.clientX - startX;
-        if (Math.abs(dx) > 40) { sfx("sparkle"); goSlide(dx > 0 ? gIdx - 1 : gIdx + 1); }
-        else { goSlide(gIdx); }
+        if (Math.abs(dx) > 30) goSlide(dx > 0 ? gIdx - 1 : gIdx + 1);
+        else goSlide(gIdx);
+        galAutoStart();
       });
-      gw.addEventListener("mouseleave", function() { isDragging = false; sl.style.transition = ""; goSlide(gIdx); });
+      gw.addEventListener("mouseleave", function() { if(isDragging){ isDragging=false; sl.style.transition=""; goSlide(gIdx); galAutoStart(); } });
     }
 
     /* gallery stubs for nav compatibility */
-    function gzStart() {}
-    function gzStop()  {}
+    function gzStart() { galAutoStart(); }
+    function gzStop()  { galAutoStop(); }
 
     /* ══════════════════════════════════════
        SCREEN NAVIGATION
@@ -2549,9 +2557,10 @@
       setTimeout(function () { sfx("fanfare"); toCake(); }, 5500);
     }
 
-    function toMemories() { sfx("whoosh"); showScreen("s-bday"); startHearts(); }
+    function toMemories() { sfx("whoosh"); showScreen("s-bday"); startHearts(); goSlide(0); galAutoStart(); }
 
     function toDiary() {
+      galAutoStop();
       sfx("gift");
       showScreen("s-diary");
       buildDiary();
