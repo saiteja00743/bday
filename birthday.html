@@ -42,7 +42,9 @@
       font-family: var(--fb);
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
-      user-select: none
+      user-select: none;
+      overscroll-behavior: none;
+      -ms-scroll-chaining: none
     }
 
     /* CANVAS */
@@ -71,8 +73,11 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity .5s var(--ease);
-      overflow: hidden;
-      overflow-y: auto
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      touch-action: pan-y
     }
 
     .screen.active {
@@ -931,7 +936,9 @@
     /* ── SCREEN 6: BIRTHDAY ── */
     #s-bday {
       overflow-y: auto;
-      justify-content: flex-start
+      -webkit-overflow-scrolling: touch;
+      justify-content: flex-start;
+      touch-action: pan-y
     }
 
     #s-bday .content {
@@ -1213,7 +1220,9 @@
     /* ── SCREEN 7: LETTER (SCROLL) ── */
     #s-letter {
       overflow-y: auto;
-      -webkit-overflow-scrolling: touch
+      -webkit-overflow-scrolling: touch;
+      justify-content: flex-start;
+      touch-action: pan-y
     }
     #s-letter .content {
       width: 100%;
@@ -1223,7 +1232,8 @@
       flex-direction: column;
       align-items: center;
       gap: 18px;
-      min-height: 100%
+      min-height: 100%;
+      flex: 0 0 auto
     }
 
     /* hint above scroll */
@@ -1581,6 +1591,8 @@
     #s-diary {
       background: radial-gradient(circle at 50% 40%, #6b1a1a, #2a0808 85%);
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y
     }
 
     #s-diary .content {
@@ -3048,6 +3060,8 @@
       var au = document.getElementById("bg-music");
       if (au && musicOn && au.paused) { au.volume = 0.25; au.play().catch(function(){}); }
       sfx("celebrate"); startHearts(); showScreen("s-bday");
+      /* reinit gallery widths since we're coming back from cake */
+      requestAnimationFrame(function() { applyGalWidths(); galAutoStart(); });
     }
     function ckAgain() { ckStopSong(); ckInit(); }
 
@@ -3496,10 +3510,6 @@
       if (e.key === "Backspace") kb();
     });
 
-    /* Prevent pull-to-refresh on non-scroll screens */
-    document.addEventListener("touchmove", function (e) {
-      if (!e.target.closest("#s-bday,#s-letter,#s-cake")) e.preventDefault();
-    }, { passive: false });
   </script>
 </body>
 
