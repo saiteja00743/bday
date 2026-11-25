@@ -345,13 +345,33 @@
     }
 
     .tap-hint {
-      margin-top: 36px;
+      margin-top: 20px;
       font-family: var(--fs);
       font-style: italic;
       font-size: clamp(14px, 4vw, 17px);
       color: rgba(227, 185, 85, .9);
       letter-spacing: .08em;
       animation: tap-pulse 1.5s ease-in-out infinite
+    }
+
+    .headphone-hint {
+      margin-top: 28px;
+      font-family: var(--fb);
+      font-size: clamp(11px, 3vw, 13px);
+      color: rgba(255, 255, 255, .55);
+      letter-spacing: .06em;
+      text-align: center;
+      padding: 6px 16px;
+      border: 1px solid rgba(255, 255, 255, .15);
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      animation: hp-fade 2s ease-in-out infinite alternate
+    }
+
+    @keyframes hp-fade {
+      0% { opacity: .5 }
+      100% { opacity: 1 }
     }
 
     @keyframes tap-pulse {
@@ -2290,6 +2310,7 @@
       <span class="lock-heart">♥</span>
       <h1 class="locked-title">LOCKED</h1>
       <p class="locked-sub">A little surprise is waiting for you...</p>
+      <div class="headphone-hint">🎧 Wear headphones for the best experience</div>
       <div class="tap-hint">👆 Tap to begin</div>
     </div>
   </div>
@@ -2546,8 +2567,8 @@
         { url: "gallery/g1.jpg", caption: "Gorgeous as always ✨" },
         { url: "gallery/g2.jpg", caption: "That smile says it all 💖" },
         { url: "gallery/g3.jpg", caption: "Pure elegance 🌸" },
-        { url: "gallery/g4.jpg", caption: "My favourite person 🥺❤️" },
-        { url: "gallery/g5.jpg", caption: "So much happiness 💕" },
+        { url: "gallery/g24.jpg", caption: "My favourite person 🥺❤️" },
+        { url: "gallery/g11.jpg", caption: "So much happiness 💕" },
         { url: "gallery/g6.jpg", caption: "Radiant & beautiful 🌟" },
         { url: "gallery/g7.jpg", caption: "Every pic a masterpiece 🎨" },
         { url: "gallery/g8.jpg", caption: "Sweet memories 🍬" },
@@ -2992,7 +3013,14 @@
       "You are the most beautiful part of my life, and I'm so incredibly lucky to have you. Your smile has the power to make everything better — it's honestly one of the most beautiful things in this world.",
       "I want you to know that you are *irreplaceable*. You matter more than words can say. Every single day you inspire me, make me laugh, and remind me what truly matters in life.",
       "On your special day, I want you to feel every ounce of love I have for you. You deserve the world — nothing but pure joy, warmth, and magic, just like you bring to everyone around you. 🌹",
-      "Always yours. Always here. Always grateful. ♥"
+      "Always yours. Always here. Always grateful. ♥"  ,
+     "m so incredibly lucky to have you. Your smile has the power to make everything better — it's honestly one of the most beautiful things in this world.",
+      "I want you to know that you are *irreplaceable*. You matter more than words can say. Every single day you inspire me, make me laugh, and remind me what truly matters in life.",
+      "On your special day, I want you to feel every ounce of love I have for you. You deserve the world — nothing but pure joy, warmth, and magic, just like you bring to everyone around you. 🌹",
+      "Always yours. Always here. Always grateful'"
+
+
+      
     ];
 
     function scrBuild() {

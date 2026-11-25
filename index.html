@@ -345,13 +345,33 @@
     }
 
     .tap-hint {
-      margin-top: 36px;
+      margin-top: 20px;
       font-family: var(--fs);
       font-style: italic;
       font-size: clamp(14px, 4vw, 17px);
       color: rgba(227, 185, 85, .9);
       letter-spacing: .08em;
       animation: tap-pulse 1.5s ease-in-out infinite
+    }
+
+    .headphone-hint {
+      margin-top: 28px;
+      font-family: var(--fb);
+      font-size: clamp(11px, 3vw, 13px);
+      color: rgba(255, 255, 255, .55);
+      letter-spacing: .06em;
+      text-align: center;
+      padding: 6px 16px;
+      border: 1px solid rgba(255, 255, 255, .15);
+      border-radius: 20px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      animation: hp-fade 2s ease-in-out infinite alternate
+    }
+
+    @keyframes hp-fade {
+      0% { opacity: .5 }
+      100% { opacity: 1 }
     }
 
     @keyframes tap-pulse {
@@ -2290,6 +2310,7 @@
       <span class="lock-heart">♥</span>
       <h1 class="locked-title">LOCKED</h1>
       <p class="locked-sub">A little surprise is waiting for you...</p>
+      <div class="headphone-hint">🎧 Wear headphones for the best experience</div>
       <div class="tap-hint">👆 Tap to begin</div>
     </div>
   </div>
