@@ -2389,7 +2389,20 @@
           style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></video></div>
       <h2 class="sp-heading">It's Your<br><span>Special Day</span> 🌸</h2>
       <p class="sp-sub">I made something special for you...</p>
-      <button class="btn-prim" onclick="toBirthday()">START &nbsp;🌹</button>
+      <button class="btn-prim" onclick="toMemoryVid()">START &nbsp;🌹</button>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 4B: MEMORY VIDEO ═══ -->
+  <div class="screen" id="s-memvid">
+    <div class="screen-bg bg-special"></div>
+    <div class="stars-wrap" id="st-memvid"></div>
+    <div class="content">
+      <div class="sp-panda"><video id="vid-memvid" src="4.mp4" loop muted playsinline preload="none"
+          style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block"></video></div>
+      <h2 class="sp-heading">A Little<br><span>Throwback</span> 🎂</h2>
+      <p class="sp-sub">Your 2nd birthday — so adorable! 🥺</p>
+      <button class="btn-prim" onclick="toBirthday()">NEXT &nbsp;🌹</button>
     </div>
   </div>
 
@@ -2924,7 +2937,7 @@
       document.querySelectorAll(".screen").forEach(function (s) { s.classList.remove("active"); });
       var el = document.getElementById(id); if (el) el.classList.add("active");
       curScreen = id;
-      var vidMap = { "s-load": "vid-load", "s-special": "vid-special", "s-count": "vid-count" };
+      var vidMap = { "s-load": "vid-load", "s-special": "vid-special", "s-memvid": "vid-memvid", "s-count": "vid-count" };
       Object.keys(vidMap).forEach(function (screenId) {
         var video = document.getElementById(vidMap[screenId]);
         if (!video) return;
@@ -2971,6 +2984,11 @@
         else setTimeout(function () { sfx("ding"); showScreen("s-special"); }, 300);
       }
       setTimeout(function () { requestAnimationFrame(step); }, 100);
+    }
+
+    function toMemoryVid() {
+      sfx("whoosh");
+      showScreen("s-memvid");
     }
 
     function toBirthday() {
