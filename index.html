@@ -3262,7 +3262,7 @@
       var au = document.getElementById("bg-music");
       var btn = document.getElementById("music-btn");
       if (au && au.src && !musicOn) {
-        au.volume = 0.07;
+        au.volume = 0.03;
         au.play().then(function () {
           musicOn = true;
           if (btn) btn.textContent = "🎵";
