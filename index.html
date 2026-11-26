@@ -182,17 +182,11 @@
 
     .headphone-tap {
       margin-top: 38px;
-      padding: 12px 20px;
-      border: 1px solid rgba(200, 16, 46, .7);
-      border-radius: 24px;
-      background: rgba(200, 16, 46, .12);
-      color: #fff;
+      color: rgba(255, 255, 255, .72);
       font-family: var(--fb);
       font-size: 11px;
       font-weight: 500;
       letter-spacing: .28em;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
       opacity: 0;
       animation: hp-text-in .7s 1.6s ease-out forwards, hp-tap-pulse 1.8s 2.3s ease-in-out infinite
     }
@@ -2546,7 +2540,7 @@
         <strong>USE HEADPHONE</strong>
         <span>For Better Experience</span>
       </div>
-      <button class="headphone-tap" type="button" onclick="event.stopPropagation(); enterExperience()">TAP TO START</button>
+      <div class="headphone-tap">TAP TO START</div>
     </div>
   </div>
 
