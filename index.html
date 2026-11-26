@@ -1578,6 +1578,69 @@
       height: 0
     }
 
+    /* ── EDIT VIDEO BEFORE CAKE ── */
+    #s-edit {
+      background: #120309
+    }
+
+    #s-edit .edit-video-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    #vid-edit {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #120309
+    }
+
+    .edit-play {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 20;
+      transform: translate(-50%, -50%);
+      border: 1px solid #e3b955;
+      border-radius: 999px;
+      padding: 12px 20px;
+      background: rgba(18, 3, 9, .88);
+      color: #fff7df;
+      font: 700 1rem 'Nunito', sans-serif;
+      cursor: pointer
+    }
+
+    .edit-download {
+      position: fixed;
+      left: 16px;
+      bottom: 20px;
+      z-index: 20;
+      border: 1px solid rgba(227, 185, 85, .7);
+      border-radius: 999px;
+      padding: 9px 16px;
+      background: rgba(18, 3, 9, .78);
+      color: #fff7df;
+      font: 700 .85rem 'Nunito', sans-serif;
+      text-decoration: none
+    }
+
+    .edit-skip {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 20;
+      border: 1px solid rgba(227, 185, 85, .7);
+      border-radius: 999px;
+      padding: 9px 16px;
+      background: rgba(18, 3, 9, .78);
+      color: #fff7df;
+      font: 700 .85rem 'Nunito', sans-serif;
+      cursor: pointer
+    }
+
     /* ── SCREEN 9: CAKE ── */
     #s-cake {
       overflow-y: auto;
@@ -2546,6 +2609,17 @@
     </div>
   </div>
 
+  <!-- ═══ EDIT VIDEO: BEFORE CAKE CUTTING ═══ -->
+  <div class="screen" id="s-edit">
+    <div class="edit-video-wrap">
+      <video id="vid-edit" src="edit.mp4" controls playsinline preload="auto"
+        onended="startCake()"></video>
+    </div>
+    <button class="edit-play" id="edit-play" onclick="playEditVideo()">Tap to play with sound</button>
+    <a class="edit-download" href="edit.mp4" download="birthday-video.mp4">Download video ↓</a>
+    <button class="edit-skip" onclick="startCake()">Skip to cake →</button>
+  </div>
+
   <!-- ═══ SCREEN 9: CUT THE CAKE ═══ -->
   <div class="screen" id="s-cake">
     <div class="stars-wrap" id="st-cake"></div>
@@ -2700,7 +2774,7 @@
        STARS
     ══════════════════════════════════════ */
     function buildStars() {
-      ["st-lock", "st-pass", "st-load", "st-special", "st-count", "st-bday", "st-diary", "st-letter", "st-cake"].forEach(function (id) {
+      ["st-lock", "st-pass", "st-load", "st-special", "st-count", "st-bday", "st-diary", "st-letter", "st-edit", "st-cake"].forEach(function (id) {
         var wrap = document.getElementById(id); if (!wrap) return;
         for (var i = 0; i < 40; i++) {
           var s = document.createElement("div"); s.className = "star";
@@ -3157,13 +3231,50 @@
        🎂  CAKE SCREEN
     ══════════════════════════════════════ */
     function toCake() {
-      if (curScreen === "s-cake") return;
+      if (curScreen === "s-cake" || curScreen === "s-edit") return;
       clearTimeout(cakeAdvanceTimer);
       cakeAdvanceTimer = null;
       sfx("whoosh");
       /* pause main music while birthday song plays */
       var au = document.getElementById("bg-music");
       if (au && !au.paused) au.pause();
+      showScreen("s-edit");
+      var editVideo = document.getElementById("vid-edit");
+      if (editVideo) {
+        editVideo.currentTime = 0;
+        editVideo.onerror = function () { startCake(); };
+        editVideo.pause();
+        var playButton = document.getElementById("edit-play");
+        if (playButton) {
+          playButton.textContent = "Tap to play with sound";
+          playButton.hidden = false;
+        }
+      }
+    }
+
+    function playEditVideo() {
+      var editVideo = document.getElementById("vid-edit");
+      var playButton = document.getElementById("edit-play");
+      if (!editVideo) return;
+      editVideo.muted = false;
+      editVideo.play().then(function () {
+        if (playButton) playButton.hidden = true;
+      }).catch(function () {
+        if (playButton) playButton.hidden = false;
+      });
+    }
+
+    function startCake() {
+      if (curScreen === "s-cake") return;
+      clearTimeout(cakeAdvanceTimer);
+      cakeAdvanceTimer = null;
+      var editVideo = document.getElementById("vid-edit");
+      if (editVideo) {
+        editVideo.pause();
+        editVideo.onerror = null;
+      }
+      var playButton = document.getElementById("edit-play");
+      if (playButton) playButton.hidden = true;
       showScreen("s-cake");
       ckInit();
     }
