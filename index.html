@@ -180,6 +180,16 @@
       text-transform: none
     }
 
+    .headphone-tap {
+      margin-top: 38px;
+      color: rgba(255, 255, 255, .72);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .28em;
+      opacity: 0;
+      animation: hp-text-in .7s 1.6s ease-out forwards, hp-tap-pulse 1.8s 2.3s ease-in-out infinite
+    }
+
     @keyframes hp-draw {
       to { stroke-dashoffset: 0 }
     }
@@ -197,6 +207,10 @@
 
     @keyframes hp-text-in {
       to { opacity: 1; transform: translateY(0) }
+    }
+
+    @keyframes hp-tap-pulse {
+      50% { opacity: .45 }
     }
 
     .screen:not(.active) .star {
@@ -2525,6 +2539,7 @@
         <strong>USE HEADPHONE</strong>
         <span>For Better Experience</span>
       </div>
+      <div class="headphone-tap">TAP TO START</div>
     </div>
   </div>
 
@@ -2886,6 +2901,7 @@
       buildGallery();
       initParticles();
       initSwipe();
+      playIntroSound();
     });
 
     function applyConfig() {
@@ -3202,20 +3218,25 @@
       screen.dataset.leaving = "true";
       screen.style.transition = "opacity .65s ease";
       screen.style.opacity = "0";
-      var introSound = document.getElementById("intro-sfx");
-      if (introSound) {
-        introSound.currentTime = 0;
-        var playback = introSound.play();
-        if (playback && typeof playback.catch === "function") {
-          playback.catch(function (error) {
-            console.warn("Unable to play the intro sound:", error);
-          });
-        }
-      }
+      playIntroSound();
       setTimeout(function () {
         screen.style.opacity = "";
         showScreen("s-lock");
       }, 450);
+    }
+
+    function playIntroSound() {
+      var introSound = document.getElementById("intro-sfx");
+      if (!introSound || (!introSound.paused && !introSound.ended)) return;
+      introSound.currentTime = 0;
+      var playback = introSound.play();
+      if (playback && typeof playback.catch === "function") {
+        playback.catch(function (error) {
+          if (error.name !== "NotAllowedError") {
+            console.error("Unable to play the intro sound:", error);
+          }
+        });
+      }
     }
 
     function toPasscode() {
@@ -3234,7 +3255,7 @@
       var au = document.getElementById("bg-music");
       var btn = document.getElementById("music-btn");
       if (au && au.src && !musicOn) {
-        au.volume = 0.25;
+        au.volume = 0.13;
         au.play().then(function () {
           musicOn = true;
           if (btn) btn.textContent = "🎵";
@@ -3740,7 +3761,7 @@
       ckStopSong();
       /* resume main music at 25% vol */
       var au = document.getElementById("bg-music");
-      if (au && musicOn && au.paused) { au.volume = 0.25; au.play().catch(function () { }); }
+      if (au && musicOn && au.paused) { au.volume = 0.13; au.play().catch(function () { }); }
       sfx("celebrate"); startHearts(); showScreen("s-bday");
       /* reinit gallery widths since we're coming back from cake */
       requestAnimationFrame(function () { applyGalWidths(); galAutoStart(); });
@@ -3885,7 +3906,7 @@
       var au = document.getElementById("bg-music");
       var btn = document.getElementById("music-btn");
       if (musicOn) { au.pause(); btn.textContent = "🔇"; musicOn = false; }
-      else { au.volume = 0.25; au.play().catch(function () { }); btn.textContent = "🎵"; musicOn = true; }
+      else { au.volume = 0.13; au.play().catch(function () { }); btn.textContent = "🎵"; musicOn = true; }
     }
 
     /* ══════════════════════════════════════
