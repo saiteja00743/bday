@@ -87,7 +87,7 @@
 
     /* ── SCREEN 0: HEADPHONE PROMPT ── */
     #s-headphone {
-      background: #071733;
+      background: radial-gradient(ellipse 80% 48% at 50% 44%, rgba(200, 16, 46, .2), transparent 72%), #000;
       cursor: pointer
     }
 
@@ -119,7 +119,7 @@
       width: 78%;
       height: 78%;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 255, 255, .08), transparent 68%);
+      background: radial-gradient(circle, rgba(200, 16, 46, .22), transparent 68%);
       opacity: 0;
       animation: hp-breathe 2.2s ease-out infinite
     }
@@ -128,7 +128,7 @@
       width: 78%;
       height: 78%;
       overflow: visible;
-      filter: drop-shadow(0 0 10px rgba(255, 255, 255, .12))
+      filter: drop-shadow(0 0 12px rgba(200, 16, 46, .4))
     }
 
     .headphone-icon path,
@@ -145,7 +145,7 @@
 
     .headphone-icon .hp-earleft,
     .headphone-icon .hp-earright {
-      fill: rgba(7, 23, 51, .9);
+      fill: #000;
       stroke-dasharray: 150;
       stroke-dashoffset: 150;
       animation-duration: 1s;
@@ -2812,6 +2812,7 @@
     </div>
   </div>
 
+  <audio id="intro-sfx" src="netflix%20sfx.mp3" preload="auto"></audio>
   <audio id="bg-music" loop></audio>
 
   <script>
@@ -3196,14 +3197,23 @@
     }
 
     function enterExperience() {
-      sfx("heart");
       var screen = document.getElementById("s-headphone");
-      if (screen) {
-        screen.style.transition = "opacity .65s ease";
-        screen.style.opacity = "0";
+      if (!screen || screen.dataset.leaving === "true") return;
+      screen.dataset.leaving = "true";
+      screen.style.transition = "opacity .65s ease";
+      screen.style.opacity = "0";
+      var introSound = document.getElementById("intro-sfx");
+      if (introSound) {
+        introSound.currentTime = 0;
+        var playback = introSound.play();
+        if (playback && typeof playback.catch === "function") {
+          playback.catch(function (error) {
+            console.warn("Unable to play the intro sound:", error);
+          });
+        }
       }
       setTimeout(function () {
-        if (screen) screen.style.opacity = "";
+        screen.style.opacity = "";
         showScreen("s-lock");
       }, 450);
     }
