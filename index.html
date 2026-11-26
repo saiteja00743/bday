@@ -85,6 +85,120 @@
       pointer-events: all
     }
 
+    /* ── SCREEN 0: HEADPHONE PROMPT ── */
+    #s-headphone {
+      background: #071733;
+      cursor: pointer
+    }
+
+    #s-headphone .headphone-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 24px
+    }
+
+    .headphone-icon-wrap {
+      position: relative;
+      width: min(190px, 48vw);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      margin: 0 0 34px;
+      animation: hp-float 3s ease-in-out infinite
+    }
+
+    .headphone-icon-wrap::before {
+      content: "";
+      position: absolute;
+      width: 78%;
+      height: 78%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, .08), transparent 68%);
+      opacity: 0;
+      animation: hp-breathe 2.2s ease-out infinite
+    }
+
+    .headphone-icon {
+      width: 78%;
+      height: 78%;
+      overflow: visible;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, .12))
+    }
+
+    .headphone-icon path,
+    .headphone-icon rect {
+      fill: none;
+      stroke: #fff;
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 220;
+      stroke-dashoffset: 220;
+      animation: hp-draw 1.25s .15s ease-out forwards
+    }
+
+    .headphone-icon .hp-earleft,
+    .headphone-icon .hp-earright {
+      fill: rgba(7, 23, 51, .9);
+      stroke-dasharray: 150;
+      stroke-dashoffset: 150;
+      animation-duration: 1s;
+      animation-delay: .65s
+    }
+
+    .headphone-text {
+      color: #fff;
+      text-align: center;
+      font-family: var(--fb);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+      line-height: .92;
+      opacity: 0;
+      transform: translateY(18px);
+      animation: hp-text-in .8s .95s ease-out forwards
+    }
+
+    .headphone-text strong {
+      display: block;
+      font-size: clamp(22px, 5.8vw, 30px);
+      letter-spacing: .03em
+    }
+
+    .headphone-text span {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--fs);
+      font-size: clamp(18px, 5vw, 27px);
+      font-weight: 400;
+      text-transform: none
+    }
+
+    @keyframes hp-draw {
+      to { stroke-dashoffset: 0 }
+    }
+
+    @keyframes hp-float {
+      0%, 100% { transform: translateY(0) }
+      50% { transform: translateY(-9px) }
+    }
+
+    @keyframes hp-breathe {
+      0% { transform: scale(.55); opacity: 0 }
+      35% { opacity: 1 }
+      100% { transform: scale(1.35); opacity: 0 }
+    }
+
+    @keyframes hp-text-in {
+      to { opacity: 1; transform: translateY(0) }
+    }
+
     .screen:not(.active) .star {
       animation-play-state: paused
     }
@@ -2391,11 +2505,31 @@
 <body>
 
   <canvas id="particle-canvas"></canvas>
-  <button id="music-btn" onclick="toggleMusic()">🎵</button>
+  <button id="music-btn" onclick="toggleMusic()" style="display:none">🎵</button>
   <div class="floating-hearts-wrap" id="fhearts"></div>
 
-  <!-- ═══ SCREEN 1: LOCK ═══ -->
-  <div class="screen active" id="s-lock" onclick="toPasscode()" style="cursor:pointer">
+  <!-- ═══ SCREEN 1: HEADPHONES ═══ -->
+  <div class="screen active" id="s-headphone" onclick="enterExperience()" style="cursor:pointer">
+    <div class="headphone-content">
+      <div class="headphone-icon-wrap">
+        <svg class="headphone-icon" viewBox="0 0 160 160" aria-hidden="true">
+          <path d="M32 82V68C32 40 53 20 80 20C107 20 128 40 128 68V82"/>
+          <path d="M45 82V69C45 48 60 35 80 35C100 35 115 48 115 69V82"/>
+          <rect class="hp-earleft" x="25" y="80" width="24" height="48" rx="10"/>
+          <rect class="hp-earleft" x="111" y="80" width="24" height="48" rx="10"/>
+          <path d="M25 94V118"/>
+          <path d="M135 94V118"/>
+        </svg>
+      </div>
+      <div class="headphone-text">
+        <strong>USE HEADPHONE</strong>
+        <span>For Better Experience</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SCREEN 2: LOCK ═══ -->
+  <div class="screen" id="s-lock" onclick="toPasscode()" style="cursor:pointer">
     <div class="screen-bg bg-lock"></div>
     <div class="stars-wrap" id="st-lock"></div>
     <div class="content">
@@ -2735,7 +2869,7 @@
        STATE
     ══════════════════════════════════════ */
     var code = "";
-    var curScreen = "s-lock";
+    var curScreen = "s-headphone";
     var gIdx = 0, gCount = 0;
     var gSX = 0, gDrag = false;
     var heartTmr = null;
@@ -3047,7 +3181,7 @@
       var el = document.getElementById(id); if (el) el.classList.add("active");
       curScreen = id;
       var musicButton = document.getElementById("music-btn");
-      if (musicButton) musicButton.style.display = id === "s-edit" ? "none" : "";
+      if (musicButton) musicButton.style.display = (id === "s-edit" || id === "s-headphone") ? "none" : "";
       var vidMap = { "s-load": "vid-load", "s-special": "vid-special", "s-memvid": "vid-memvid", "s-count": "vid-count" };
       Object.keys(vidMap).forEach(function (screenId) {
         var video = document.getElementById(vidMap[screenId]);
@@ -3059,6 +3193,19 @@
           video.pause();
         }
       });
+    }
+
+    function enterExperience() {
+      sfx("heart");
+      var screen = document.getElementById("s-headphone");
+      if (screen) {
+        screen.style.transition = "opacity .65s ease";
+        screen.style.opacity = "0";
+      }
+      setTimeout(function () {
+        if (screen) screen.style.opacity = "";
+        showScreen("s-lock");
+      }, 450);
     }
 
     function toPasscode() {
