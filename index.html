@@ -182,10 +182,17 @@
 
     .headphone-tap {
       margin-top: 38px;
-      color: rgba(255, 255, 255, .72);
+      padding: 12px 20px;
+      border: 1px solid rgba(200, 16, 46, .7);
+      border-radius: 24px;
+      background: rgba(200, 16, 46, .12);
+      color: #fff;
+      font-family: var(--fb);
       font-size: 11px;
       font-weight: 500;
       letter-spacing: .28em;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
       opacity: 0;
       animation: hp-text-in .7s 1.6s ease-out forwards, hp-tap-pulse 1.8s 2.3s ease-in-out infinite
     }
@@ -2539,7 +2546,7 @@
         <strong>USE HEADPHONE</strong>
         <span>For Better Experience</span>
       </div>
-      <div class="headphone-tap">TAP TO START</div>
+      <button class="headphone-tap" type="button" onclick="event.stopPropagation(); enterExperience()">TAP TO START</button>
     </div>
   </div>
 
@@ -3255,7 +3262,7 @@
       var au = document.getElementById("bg-music");
       var btn = document.getElementById("music-btn");
       if (au && au.src && !musicOn) {
-        au.volume = 0.13;
+        au.volume = 0.07;
         au.play().then(function () {
           musicOn = true;
           if (btn) btn.textContent = "🎵";
@@ -3761,7 +3768,7 @@
       ckStopSong();
       /* resume main music at 25% vol */
       var au = document.getElementById("bg-music");
-      if (au && musicOn && au.paused) { au.volume = 0.13; au.play().catch(function () { }); }
+      if (au && musicOn && au.paused) { au.volume = 0.07; au.play().catch(function () { }); }
       sfx("celebrate"); startHearts(); showScreen("s-bday");
       /* reinit gallery widths since we're coming back from cake */
       requestAnimationFrame(function () { applyGalWidths(); galAutoStart(); });
@@ -3906,7 +3913,7 @@
       var au = document.getElementById("bg-music");
       var btn = document.getElementById("music-btn");
       if (musicOn) { au.pause(); btn.textContent = "🔇"; musicOn = false; }
-      else { au.volume = 0.10; au.play().catch(function () { }); btn.textContent = "🎵"; musicOn = true; }
+      else { au.volume = 0.07; au.play().catch(function () { }); btn.textContent = "🎵"; musicOn = true; }
     }
 
     /* ══════════════════════════════════════
