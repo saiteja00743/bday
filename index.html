@@ -1580,65 +1580,95 @@
 
     /* ── EDIT VIDEO BEFORE CAKE ── */
     #s-edit {
+      box-sizing: border-box;
+      padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
       background: #120309
     }
 
-    #s-edit .edit-video-wrap {
-      position: absolute;
-      inset: 0;
+    .edit-stage {
+      width: min(100%, 980px);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px
+    }
+
+    .edit-video-wrap {
+      width: 100%;
+      flex: 1;
+      min-height: 0;
       display: flex;
       align-items: center;
       justify-content: center
     }
 
     #vid-edit {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: contain;
-      background: #120309
+      background: #120309;
+      border-radius: 12px
     }
 
-    .edit-play {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      z-index: 20;
-      transform: translate(-50%, -50%);
-      border: 1px solid #e3b955;
-      border-radius: 999px;
-      padding: 12px 20px;
-      background: rgba(18, 3, 9, .88);
+    .edit-status {
+      margin: 0;
       color: #fff7df;
-      font: 700 1rem 'Nunito', sans-serif;
+      font: 600 .9rem 'Nunito', sans-serif;
+      text-align: center
+    }
+
+    .edit-actions {
+      width: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px
+    }
+
+    .edit-actions.show {
+      display: flex
+    }
+
+    .edit-action {
+      border-radius: 999px;
+      padding: 10px 18px;
+      border: 1px solid rgba(227, 185, 85, .75);
+      background: rgba(18, 3, 9, .9);
+      color: #fff7df;
+      font: 700 .9rem 'Nunito', sans-serif;
+      text-align: center;
+      text-decoration: none;
       cursor: pointer
     }
 
-    .edit-download {
-      position: fixed;
-      left: 16px;
-      bottom: 20px;
-      z-index: 20;
-      border: 1px solid rgba(227, 185, 85, .7);
-      border-radius: 999px;
-      padding: 9px 16px;
-      background: rgba(18, 3, 9, .78);
-      color: #fff7df;
-      font: 700 .85rem 'Nunito', sans-serif;
-      text-decoration: none
+    .edit-action.primary {
+      border-color: #e3b955;
+      background: #e3b955;
+      color: #321009
     }
 
-    .edit-skip {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 20;
-      border: 1px solid rgba(227, 185, 85, .7);
-      border-radius: 999px;
-      padding: 9px 16px;
-      background: rgba(18, 3, 9, .78);
-      color: #fff7df;
-      font: 700 .85rem 'Nunito', sans-serif;
-      cursor: pointer
+    .edit-action:focus-visible {
+      outline: 2px solid #fff7df;
+      outline-offset: 3px
+    }
+
+    @media (max-height: 520px) {
+      #s-edit {
+        padding-top: 8px;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom))
+      }
+
+      .edit-stage {
+        gap: 8px
+      }
+
+      .edit-action {
+        padding: 8px 14px
+      }
     }
 
     /* ── SCREEN 9: CAKE ── */
@@ -2418,7 +2448,7 @@
         <button class="key" onclick="kb()">⌫</button>
       </div>
       <p class="pass-hint">✦ Some memories are the key to everything ✦</p>
-      <p class="pin-reveal">🔑 PIN &nbsp;<span>2005</span></p>
+      <p class="pin-reveal">🔑 PIN &nbsp;<span>2811</span></p>
     </div>
   </div>
 
@@ -2611,13 +2641,18 @@
 
   <!-- ═══ EDIT VIDEO: BEFORE CAKE CUTTING ═══ -->
   <div class="screen" id="s-edit">
-    <div class="edit-video-wrap">
-      <video id="vid-edit" src="edit.mp4" controls playsinline preload="auto"
-        onended="startCake()"></video>
+    <div class="edit-stage">
+      <div class="edit-video-wrap">
+        <video id="vid-edit" src="edit.mp4" controls playsinline preload="auto" aria-label="Birthday edit video"
+          onplay="clearEditStatus()" onended="editVideoEnded()" onerror="editVideoFailed()"></video>
+      </div>
+      <p class="edit-status" id="edit-status" aria-live="polite"></p>
+      <div class="edit-actions" id="edit-actions">
+        <button class="edit-action" type="button" onclick="replayEditVideo()">Replay video ↺</button>
+        <a class="edit-action" href="edit.mp4" download="birthday-video.mp4">Download video ↓</a>
+        <button class="edit-action primary" type="button" onclick="startCake()">Continue to cake →</button>
+      </div>
     </div>
-    <button class="edit-play" id="edit-play" onclick="playEditVideo()">Tap to play with sound</button>
-    <a class="edit-download" href="edit.mp4" download="birthday-video.mp4">Download video ↓</a>
-    <button class="edit-skip" onclick="startCake()">Skip to cake →</button>
   </div>
 
   <!-- ═══ SCREEN 9: CUT THE CAKE ═══ -->
@@ -2651,7 +2686,7 @@
     ══════════════════════════════════════ */
     var CFG = {
       name: "Varshini",        // ← her name
-      passcode: "2005",               // ← 4-digit secret code
+      passcode: "2811",               // ← 4-digit secret code
       profilePic: "profile.jpg",      // ← photo URL
       emoji: "🌸",                    // ← placeholder emoji
       birthday: "2005-11-28",         // ← YYYY-MM-DD
@@ -3011,6 +3046,8 @@
       document.querySelectorAll(".screen").forEach(function (s) { s.classList.remove("active"); });
       var el = document.getElementById(id); if (el) el.classList.add("active");
       curScreen = id;
+      var musicButton = document.getElementById("music-btn");
+      if (musicButton) musicButton.style.display = id === "s-edit" ? "none" : "";
       var vidMap = { "s-load": "vid-load", "s-special": "vid-special", "s-memvid": "vid-memvid", "s-count": "vid-count" };
       Object.keys(vidMap).forEach(function (screenId) {
         var video = document.getElementById(vidMap[screenId]);
@@ -3242,25 +3279,45 @@
       var editVideo = document.getElementById("vid-edit");
       if (editVideo) {
         editVideo.currentTime = 0;
-        editVideo.onerror = function () { startCake(); };
-        editVideo.pause();
-        var playButton = document.getElementById("edit-play");
-        if (playButton) {
-          playButton.textContent = "Tap to play with sound";
-          playButton.hidden = false;
-        }
+        editVideo.muted = false;
+        var actions = document.getElementById("edit-actions");
+        if (actions) actions.classList.remove("show");
+        clearEditStatus();
+        editVideo.play().catch(function () {
+          if (curScreen === "s-edit") {
+            var status = document.getElementById("edit-status");
+            if (status) status.textContent = "Autoplay was blocked. Press play in the video controls to start with sound.";
+          }
+        });
       }
     }
 
-    function playEditVideo() {
+    function clearEditStatus() {
+      var status = document.getElementById("edit-status");
+      if (status) status.textContent = "";
+    }
+
+    function editVideoEnded() {
+      var actions = document.getElementById("edit-actions");
+      if (actions) actions.classList.add("show");
+    }
+
+    function editVideoFailed() {
+      var status = document.getElementById("edit-status");
+      if (status) status.textContent = "The video couldn't be played. You can download it or continue to the cake.";
+      var actions = document.getElementById("edit-actions");
+      if (actions) actions.classList.add("show");
+    }
+
+    function replayEditVideo() {
       var editVideo = document.getElementById("vid-edit");
-      var playButton = document.getElementById("edit-play");
       if (!editVideo) return;
-      editVideo.muted = false;
-      editVideo.play().then(function () {
-        if (playButton) playButton.hidden = true;
-      }).catch(function () {
-        if (playButton) playButton.hidden = false;
+      editVideo.currentTime = 0;
+      var actions = document.getElementById("edit-actions");
+      if (actions) actions.classList.remove("show");
+      editVideo.play().catch(function () {
+        var status = document.getElementById("edit-status");
+        if (status) status.textContent = "Press play in the video controls to replay with sound.";
       });
     }
 
@@ -3273,8 +3330,6 @@
         editVideo.pause();
         editVideo.onerror = null;
       }
-      var playButton = document.getElementById("edit-play");
-      if (playButton) playButton.hidden = true;
       showScreen("s-cake");
       ckInit();
     }
@@ -3600,7 +3655,7 @@
 
     function checkCode() {
       var pd = document.getElementById("pass-display");
-      var isCorrect = (code === CFG.passcode || code === "2005" || code === "2811" || code === "2024");
+      var isCorrect = code === CFG.passcode;
       if (isCorrect) {
         // ✅ Correct
         var fl = document.createElement("div"); fl.className = "success-flash";
