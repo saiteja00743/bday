@@ -2811,16 +2811,19 @@
     <div class="content">
       <div class="ck-garland"></div>
       <h1 class="ck-title">A little sweetness ✦</h1>
+      
       <div class="ck-msg" id="ck-msg">tap "Light candles" to begin</div>
       <svg class="ck-svg" id="ck-svg" viewBox="0 0 500 430" role="img" aria-label="Birthday cake"></svg>
       <div class="ck-banner" id="ck-banner">
         <h2 id="ck-bt"></h2>
         <p>Many happy returns of the day ♥</p>
-        <div class="ck-lyrics" id="ck-lyr"></div>
+        <h1 class="ck-title">Yah whoooooo 🥳 4th Time Kuda Cake Cutting Ayipoindhooouch...😁</h1>
+        <div class="ck-lyrics" id="ck-lyr"> </div>
       </div>
       <div class="ck-step-btns" id="ck-step-btns">
         <button class="ck-btn main" id="ck-act" onclick="ckNext()"></button>
       </div>
+     
       <div class="ck-end-btns" id="ck-end" style="display:none">
         <button class="ck-btn main" onclick="ckCelebrate()">Celebrate ✿</button>
         <button class="ck-btn" onclick="ckAgain()">Cut again ↺</button>
@@ -3228,6 +3231,7 @@
 
     function playIntroSound() {
       var introSound = document.getElementById("intro-sfx");
+      sfx("bassdrop");
       if (!introSound || (!introSound.paused && !introSound.ended)) return;
       introSound.currentTime = 0;
       var playback = introSound.play();
@@ -4106,6 +4110,70 @@
       } catch (e) { }
     }
 
+    /* 🎵 helper: BASS — deep sub-bass oscillator with filter for weight */
+    function _bass(freq, type, vol, start, dur, freqEnd) {
+      try {
+        var ctx = getCtx(), t = ctx.currentTime + (start || 0);
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        var flt = ctx.createBiquadFilter();
+        o.type = type || "sawtooth"; // sawtooth has rich harmonics for bass
+        o.frequency.value = freq;
+        if (freqEnd) o.frequency.exponentialRampToValueAtTime(freqEnd, t + dur);
+        flt.type = "lowpass"; flt.frequency.value = 120; flt.Q.value = 1.5; // sub focus
+        g.gain.setValueAtTime(vol || .25, t);
+        g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        o.connect(flt); flt.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t + dur + .01);
+      } catch (e) { }
+    }
+
+    /* 🎵 helper: BASS PLUCK — quick punchy bass note with pitch drop */
+    function _bassPluck(freq, vol, start, dur) {
+      try {
+        var ctx = getCtx(), t = ctx.currentTime + (start || 0);
+        var o = ctx.createOscillator(), g = ctx.createGain();
+        var flt = ctx.createBiquadFilter();
+        o.type = "sawtooth";
+        o.frequency.setValueAtTime(freq * 2, t); // start an octave up
+        o.frequency.exponentialRampToValueAtTime(freq, t + 0.02); // fast drop
+        flt.type = "lowpass"; flt.frequency.value = 180; flt.Q.value = 2;
+        g.gain.setValueAtTime(vol || .3, t);
+        g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        o.connect(flt); flt.connect(g); g.connect(ctx.destination);
+        o.start(t); o.stop(t + dur + .01);
+      } catch (e) { }
+    }
+
+    /* 🎵 helper: BASS RUMBLE — layered sub for impact */
+    function _bassRumble(start, dur) {
+      try {
+        var ctx = getCtx(), t = ctx.currentTime + (start || 0);
+        // Layer 1: Sub fundamental
+        var o1 = ctx.createOscillator(), g1 = ctx.createGain();
+        o1.type = "sine"; o1.frequency.value = 35;
+        g1.gain.setValueAtTime(.35, t);
+        g1.gain.exponentialRampToValueAtTime(.0001, t + dur);
+        o1.connect(g1); g1.connect(ctx.destination);
+        o1.start(t); o1.stop(t + dur + .01);
+        // Layer 2: Octave up for definition
+        var o2 = ctx.createOscillator(), g2 = ctx.createGain();
+        o2.type = "triangle"; o2.frequency.value = 70;
+        g2.gain.setValueAtTime(.15, t);
+        g2.gain.exponentialRampToValueAtTime(.0001, t + dur * 0.6);
+        o2.connect(g2); g2.connect(ctx.destination);
+        o2.start(t); o2.stop(t + dur * 0.6 + .01);
+        // Layer 3: Noise burst for "thump"
+        var buf = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate);
+        var d = buf.getChannelData(0);
+        for (var i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.02));
+        var src = ctx.createBufferSource(); src.buffer = buf;
+        var flt = ctx.createBiquadFilter(); flt.type = "lowpass"; flt.frequency.value = 100;
+        var g3 = ctx.createGain(); g3.gain.setValueAtTime(.25, t); g3.gain.exponentialRampToValueAtTime(.0001, t + 0.08);
+        src.connect(flt); flt.connect(g3); g3.connect(ctx.destination);
+        src.start(t); src.stop(t + 0.09);
+      } catch (e) { }
+    }
+
     function sfx(type) {
       try {
         var ctx = getCtx();
@@ -4115,15 +4183,20 @@
           case "key":
             _osc(600, "sine", .06, 0, .05);
             _noise(.04, 0, .04, 2000, 3);
+            _bassPluck(65, .05, 0, .06);
             break;
 
           /* ⌫ Backspace delete */
           case "delete":
             _osc(300, "sine", .07, 0, .08, 200);
+            _bass(55, "triangle", .08, 0, .09, 45);
             break;
 
           /* ✅ Correct passcode — ascending triumphant chime */
           case "unlock":
+            _bassRumble(.01, .7);
+            _bass(65, "triangle", .16, .05, .65, 49);
+            _bassPluck(98, .12, .18, .28);
             _osc(523, "sine", .18, 0, .12);   // C5
             _osc(659, "sine", .18, .1, .12);   // E5
             _osc(784, "sine", .18, .2, .15);   // G5
@@ -4133,6 +4206,7 @@
 
           /* ❌ Wrong passcode — descending buzz */
           case "error":
+            _bass(55, "sawtooth", .14, 0, .32, 38);
             _osc(300, "sawtooth", .15, 0, .1, 200);
             _osc(220, "sawtooth", .15, .12, .1, 180);
             _osc(180, "sawtooth", .12, .24, .15, 150);
@@ -4142,6 +4216,7 @@
           case "whoosh":
             _noise(.12, 0, .25, 800, .8);
             _osc(400, "sine", .05, 0, .2, 200);
+            _bass(90, "triangle", .12, 0, .38, 38);
             break;
 
           /* 📖 Diary page turn — paper rustle */
@@ -4149,10 +4224,13 @@
             _noise(.15, 0, .08, 1800, 2);
             _noise(.10, .06, .10, 2200, 1.5);
             _noise(.06, .14, .08, 1500, 2);
+            _bassPluck(73, .10, .04, .16);
             break;
 
           /* 🎁 Gift / magic sparkle */
           case "gift":
+            _bassRumble(.02, .55);
+            _bassPluck(65, .16, .02, .32);
             _osc(880, "sine", .12, 0, .1);
             _osc(1047, "sine", .12, .08, .1);
             _osc(1319, "sine", .14, .16, .12);
@@ -4163,6 +4241,7 @@
 
           /* 💌 Letter seal pop / envelope open */
           case "letter":
+            _bassPluck(82, .10, .02, .22);
             _noise(.20, 0, .06, 600, 1.5);
             _osc(440, "sine", .10, .05, .15, 660);
             _osc(880, "sine", .08, .18, .2);
@@ -4171,6 +4250,10 @@
 
           /* 🎉 Celebrate — fireworks burst */
           case "celebrate":
+            _bassRumble(0, .75);
+            _bassPluck(65, .22, .08, .32);
+            _bassPluck(98, .18, .22, .32);
+            _bassPluck(131, .16, .36, .38);
             /* 3 quick pops */
             _noise(.25, 0, .07, 400, .6);
             _noise(.20, .15, .07, 500, .6);
@@ -4188,6 +4271,9 @@
 
           /* 🎂 Birthday fanfare — short jingle */
           case "fanfare":
+            _bass(49, "triangle", .16, 0, .32);
+            _bassPluck(65, .16, .30, .24);
+            _bassPluck(98, .16, .60, .38);
             _osc(523, "triangle", .15, 0, .1);  // C
             _osc(659, "triangle", .15, .1, .1);  // E
             _osc(784, "triangle", .15, .2, .1);  // G
@@ -4198,21 +4284,30 @@
 
           /* 💫 Loading complete — soft ding */
           case "ding":
+            _bassPluck(73, .12, 0, .32);
             _osc(1047, "sine", .18, 0, .5, 1319);
             _noise(.03, 0, .08, 3000, 3);
             break;
 
           /* ❤️ Heart / lock screen tap */
           case "heart":
+            _bassPluck(55, .08, 0, .12);
             _osc(220, "sine", .10, 0, .07);
             _osc(180, "sine", .08, .09, .07);
             break;
 
           /* 🌟 Star / sparkle (generic accent) */
           case "sparkle":
+            _bassPluck(82, .08, 0, .14);
             _osc(1200, "sine", .08, 0, .06);
             _osc(1600, "sine", .08, .05, .06);
             _osc(2000, "sine", .06, .1, .08);
+            break;
+
+          /* 🔊 Cinematic bass hit for the intro */
+          case "bassdrop":
+            _bassRumble(0, .9);
+            _bass(55, "sawtooth", .18, .02, .75, 32);
             break;
 
           /* default fallback */
