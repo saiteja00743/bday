@@ -2539,22 +2539,28 @@
 
     /* controls */
     .dctl {
+      position: relative;
+      z-index: 310;
       display: flex;
       gap: 12px;
       align-items: center;
       color: #e3b955;
       font: 400 1.1rem 'Kalam', cursive;
+      touch-action: manipulation
     }
 
     .dctl button {
+      min-width: 56px;
+      min-height: 48px;
       font: 700 1.2rem 'Kalam', cursive;
       color: #4a1010;
       background: #e3b955;
       border: 2px solid #9a6b2a;
       border-radius: 99px;
-      padding: 2px 18px;
+      padding: 4px 18px;
       cursor: pointer;
       transition: transform .15s;
+      touch-action: manipulation
     }
 
     .dctl button:active {
@@ -2568,10 +2574,13 @@
 
     /* skip button */
     .btn-diary-skip {
+      position: relative;
+      z-index: 310;
       margin-top: 8px;
       background: transparent;
       border: 1px solid rgba(227, 185, 85, .4);
       border-radius: 50px;
+      min-height: 48px;
       padding: 10px 32px;
       font-family: 'Kalam', cursive;
       font-size: 13px;
@@ -2579,6 +2588,7 @@
       color: rgba(227, 185, 85, .7);
       cursor: pointer;
       transition: all .3s;
+      touch-action: manipulation
     }
 
     .btn-diary-skip:hover {
@@ -2825,12 +2835,12 @@
           <div class="dv-spine" id="d-spine"></div>
         </div>
         <div class="dctl">
-          <button id="d-prev" aria-label="Previous page">‹</button>
+          <button id="d-prev" type="button" aria-label="Previous page">‹</button>
           <span id="d-hint"></span>
-          <button id="d-next" aria-label="Next page">›</button>
+          <button id="d-next" type="button" aria-label="Next page">›</button>
         </div>
       </div>
-      <button class="btn-diary-skip" onclick="toLetter()">Continue to your letter →</button>
+      <button class="btn-diary-skip" type="button" onclick="toLetter()">Continue to your letter →</button>
     </div>
   </div>
 
