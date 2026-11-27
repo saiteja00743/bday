@@ -64,7 +64,8 @@
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
+      height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1182,12 +1183,13 @@
     #s-bday .content {
       width: 100%;
       max-width: 440px;
-      padding: 50px 24px 100px;
+      padding: 50px 24px calc(100px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0;
-      margin: 0 auto
+      margin: 0 auto;
+      flex: 0 0 auto
     }
 
     .cake-wrap {
@@ -1466,7 +1468,7 @@
     #s-letter .content {
       width: 100%;
       max-width: 440px;
-      padding: 44px 20px 80px;
+      padding: 44px 20px calc(80px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1889,11 +1891,12 @@
     #s-cake .content {
       width: 100%;
       max-width: 520px;
-      padding: 18px 16px 56px;
+      padding: 18px 16px calc(56px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px
+      gap: 10px;
+      flex: 0 0 auto
     }
 
     .ck-garland {
@@ -2218,11 +2221,12 @@
     #s-diary .content {
       width: 100%;
       max-width: 760px;
-      padding: 10px 12px 48px;
+      padding: 10px 12px calc(48px + env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 10px;
+      flex: 0 0 auto;
     }
 
     /* marigold garland */
