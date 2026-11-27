@@ -2284,6 +2284,8 @@
       transform-style: preserve-3d;
       transition: transform .9s cubic-bezier(.5, 0, .2, 1);
       cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .leaf.flipped {
@@ -2546,7 +2548,8 @@
       align-items: center;
       color: #e3b955;
       font: 400 1.1rem 'Kalam', cursive;
-      touch-action: manipulation
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent
     }
 
     .dctl button {
@@ -2560,7 +2563,8 @@
       padding: 4px 18px;
       cursor: pointer;
       transition: transform .15s;
-      touch-action: manipulation
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent
     }
 
     .dctl button:active {
@@ -2599,6 +2603,7 @@
     @media(max-width:640px) {
       .book3d {
         aspect-ratio: 5/4;
+        width: min(700px, 100%, max(180px, calc(100dvh - 150px - env(safe-area-inset-bottom))));
       }
     }
 
