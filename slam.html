@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slam Book</title>
+<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#e3b955;--cr:#c8102e;--ink:#1f3a93;--paper:#fbf3df}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{min-height:100dvh;padding:26px 14px 70px;color:#fff;font-family:Georgia,serif;overflow-x:hidden;
+ background:radial-gradient(ellipse 110% 70% at 12% 0%,#9b0f28,#4a0612 38%,#150206 68%,#000) fixed}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;border-radius:50%;background:#fff;animation:tw var(--d,3s) ease-in-out infinite var(--l,0s)}
+@keyframes tw{0%,100%{opacity:.1;transform:scale(.8)}50%{opacity:.9;transform:scale(1.2)}}
+main{position:relative;z-index:1;max-width:760px;margin:0 auto}
+
+header{text-align:center;margin-bottom:16px}
+.kick{font:400 1.2rem 'Kalam',cursive;color:#f6c6cf;letter-spacing:.14em}
+h1{font:400 clamp(2.2rem,9vw,3.4rem)/1.05 'Rozha One',serif;color:var(--gold);text-shadow:0 2px 0 #0009,0 0 30px rgba(227,185,85,.3)}
+#intro{font:400 1.2rem 'Kalam',cursive;color:#ffd9df;margin-top:6px}
+
+.tabs{display:flex;gap:10px;justify-content:center;margin:14px 0 22px}
+.tabs button{font:700 1.15rem 'Kalam',cursive;padding:7px 22px;border-radius:99px;border:2px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer;transition:.2s}
+.tabs button.on{background:var(--gold);color:#4a1010;box-shadow:0 0 18px rgba(227,185,85,.45)}
+.tabs b{display:inline-block;min-width:22px;padding:0 6px;border-radius:99px;background:var(--cr);color:#fff;font-size:.9rem;margin-left:4px}
+.page[hidden]{display:none}
+
+/* ---------- notebook paper ---------- */
+.paper{position:relative;max-width:580px;margin:0 auto;padding:30px 22px 28px 66px;border-radius:6px;transform:rotate(-.5deg);
+ background:var(--paper) repeating-linear-gradient(transparent 0 31px,rgba(110,160,200,.45) 31px 32px);background-position:0 22px;
+ box-shadow:0 18px 40px #000a,inset 0 0 44px rgba(160,110,60,.25);color:#3a2412}
+.paper::before{content:"";position:absolute;left:48px;top:0;bottom:0;width:2px;background:rgba(220,70,90,.55)}
+.holes{position:absolute;left:10px;top:18px;bottom:18px;width:22px;background:radial-gradient(circle at 11px 11px,#2b0a12 0 8px,transparent 9px) 0 0/22px 44px repeat-y}
+.tape{position:absolute;top:-13px;left:34px;width:96px;height:26px;background:rgba(255,190,212,.8);transform:rotate(-6deg);box-shadow:0 2px 4px #0003}
+.tape.r{left:auto;right:30px;background:rgba(227,185,85,.8);transform:rotate(5deg)}
+.paper h2{font:400 clamp(1.7rem,7vw,2.3rem)/1.1 'Rozha One',serif;color:#7a1f1f}
+.paper .of{font:700 1.15rem 'Kalam',cursive;color:#b3261e;margin-bottom:6px}
+.doodle{position:absolute;right:16px;top:18px;width:54px;transform:rotate(10deg)}
+
+.row{display:flex;align-items:baseline;gap:8px;min-height:32px}
+.row label,.lab{font:700 1.02rem/32px 'Kalam',cursive;color:#7a4a30;white-space:nowrap}
+.row input{flex:1;min-width:0;border:0;border-bottom:1.5px dotted #8a6a50;background:transparent;font:400 1.18rem/1.4 'Kalam',cursive;color:var(--ink);outline:0;padding:0 2px}
+.row input:focus{border-bottom-color:var(--cr)}
+.area{margin:2px 0 4px}
+.area textarea{width:100%;height:96px;border:0;background:transparent;resize:none;font:400 1.18rem/32px 'Kalam',cursive;color:var(--ink);outline:0;padding:0 2px}
+.chips,.swatches,.stickers,.hearts{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 8px;align-items:center}
+.chip{font:700 1rem 'Kalam',cursive;padding:2px 14px;border-radius:99px;border:1.5px dashed #8a6a50;background:transparent;color:#5a3a28;cursor:pointer}
+.chip.on{background:#7a1f1f;border-style:solid;color:#ffe6a8}
+.sw{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1.5px #8a6a50;cursor:pointer;padding:0}
+.sw.on{transform:scale(1.2);box-shadow:0 0 0 3px #7a1f1f}
+.st{width:42px;height:42px;font-size:24px;border-radius:50%;border:1.5px dashed #8a6a50;background:transparent;cursor:pointer;padding:0}
+.st.on{background:#ffe29a;border-style:solid;transform:scale(1.15) rotate(-6deg)}
+.hearts button{font-size:28px;border:0;background:none;color:#d9c2b8;cursor:pointer;padding:0 2px;transition:.15s}
+.hearts button.on{color:#e63950;transform:scale(1.15)}
+.go{display:block;margin:16px auto 0;font:700 1.25rem 'Kalam',cursive;letter-spacing:.05em;padding:10px 28px;border-radius:99px;border:2px solid var(--gold);cursor:pointer;color:#ffe6a8;background:linear-gradient(#d41a3c,#8b0a22);box-shadow:0 5px 0 #4a0612,0 0 20px rgba(200,16,46,.5)}
+.go:active{transform:translateY(3px);box-shadow:0 2px 0 #4a0612}
+.warn{font:700 1rem 'Kalam',cursive;color:#b3261e;min-height:1.4em;text-align:center}
+.shake{animation:sh .45s}
+@keyframes sh{20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+
+/* ---------- entries ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:24px 18px}
+.card{position:relative;background:#fffaf0;border-radius:8px;overflow:hidden;color:#3a2412;box-shadow:0 12px 26px #000a;transform:rotate(var(--rot,0deg));transition:transform .25s;animation:pop .5s cubic-bezier(.3,1.5,.5,1) backwards}
+.card:hover{transform:rotate(0) scale(1.02)}
+.card.fresh{box-shadow:0 0 0 3px var(--gold),0 12px 26px #000a}
+@keyframes pop{from{opacity:0;transform:scale(.8) rotate(0)}}
+.top{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--c)}
+.top .stk{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.7);display:grid;place-items:center;font-size:26px;flex:none}
+.nm{font:400 1.35rem/1.1 'Rozha One',serif;color:#fff;text-shadow:0 2px 0 #0004;word-break:break-word}
+.nk{font:700 .95rem 'Kalam',cursive;color:#ffffffd0}
+.body{padding:10px 16px 14px;background:repeating-linear-gradient(transparent 0 27px,rgba(110,160,200,.25) 27px 28px)}
+.qa{margin:2px 0 4px}
+.qa b{display:block;font:700 .78rem 'Kalam',cursive;letter-spacing:.08em;text-transform:uppercase;color:#a0634a}
+.qa span{display:block;font:400 1.12rem/1.25 'Kalam',cursive;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.rate{color:#e63950;letter-spacing:2px;font-size:1.1rem}
+.when{font:400 .85rem 'Kalam',cursive;color:#a0866e;margin-top:6px;text-align:right}
+.del{position:absolute;top:6px;right:8px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.28);color:#fff;font-size:15px;cursor:pointer;line-height:1}
+.empty{text-align:center;font:400 1.4rem/1.4 'Kalam',cursive;color:#ffd9df;padding:40px 10px}
+.tools{display:flex;gap:10px;justify-content:center;margin-top:26px}
+.tools button{font:700 1rem 'Kalam',cursive;padding:6px 20px;border-radius:99px;border:2px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer}
+
+.fall{position:fixed;top:-40px;z-index:60;pointer-events:none;animation:fall var(--d) linear forwards}
+@keyframes fall{to{transform:translate(var(--x),110vh) rotate(540deg)}}
+@media(max-width:480px){.paper{padding:28px 14px 24px 56px}.paper::before{left:40px}.holes{left:8px}.doodle{width:42px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important}}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<main>
+  <header>
+    <div class="kick">✦ friends forever ✦</div>
+    <h1 id="ttl"></h1>
+    <p id="intro"></p>
+  </header>
+
+  <nav class="tabs">
+    <button id="tw" class="on">✍ Write</button>
+    <button id="tr">📖 Read <b id="cnt">0</b></button>
+  </nav>
+
+  <!-- WRITE -->
+  <section class="page" id="write">
+    <div class="paper" id="paper">
+      <div class="holes"></div><span class="tape"></span><span class="tape r"></span>
+      <svg class="doodle" viewBox="0 0 60 60" fill="none" stroke="#b3261e" stroke-width="2.4" stroke-linecap="round"><path d="M30 52C8 36 6 18 18 12C25 9 30 14 30 18C30 14 35 9 42 12C54 18 52 36 30 52Z" fill="#ffc2cd"/><path d="M8 8l5 5M52 6l-4 6M54 40l-6 2"/></svg>
+      <h2>Slam Book</h2>
+      <div class="of" id="of"></div>
+      <div id="form"></div>
+      <div class="warn" id="warn"></div>
+      <button class="go" id="submit">Add to my Slam Book ✦</button>
+    </div>
+  </section>
+
+  <!-- READ -->
+  <section class="page" id="read" hidden>
+    <div class="grid" id="grid"></div>
+    <div class="tools" id="tools"><button id="export">Download all ⬇</button></div>
+  </section>
+</main>
+
+<script>
+/* ============ EDIT ONLY THIS BLOCK ============ */
+var CONFIG = {
+  owner: "Kayla Varshini",
+  title: "Slam Book",
+  intro: "fill it honestly… no cheating 😜",
+  storageKey: "slambook:kayla",
+  /* the questions: type is "text", "area" (long answer) or "choice" */
+  questions: [
+    { id: "nick",   label: "Nickname I call you", type: "text" },
+    { id: "bday",   label: "Your birthday",       type: "text" },
+    { id: "food",   label: "Favourite food",      type: "text" },
+    { id: "song",   label: "Favourite song",      type: "text" },
+    { id: "word",   label: "One word for me",     type: "text" },
+    { id: "like",   label: "What you like most about me", type: "area" },
+    { id: "memory", label: "Our best memory",     type: "area" },
+    { id: "secret", label: "A secret of mine you know (shh)", type: "text" },
+    { id: "rem",    label: "Will you remember me?", type: "choice", options: ["Always ♥", "Maybe 🤔", "Who are you? 😜"] },
+    { id: "msg",    label: "Your message for me", type: "area" }
+  ],
+  colors: ["#e63950", "#ff8a1f", "#f2b700", "#14b87a", "#2eaee8", "#7b61ff", "#e04fa8", "#4a5568"],
+  stickers: ["🌸", "⭐", "💖", "😎", "🦋", "🍓", "🌈", "🎀"]
+};
+/* ================================================ */
+var $ = function (s) { return document.querySelector(s); };
+var Q = CONFIG.questions, state = { color: CONFIG.colors[0], sticker: CONFIG.stickers[0], rate: 0, choice: {} };
+var entries = [], freshId = null;
+
+/* stars like the rest of your site */
+(function () {
+  var w = $("#stars");
+  for (var i = 0; i < 45; i++) {
+    var s = document.createElement("div"), z = Math.random() * 2.4 + .6;
+    s.className = "star";
+    s.style.cssText = "width:" + z + "px;height:" + z + "px;left:" + Math.random() * 100 + "%;top:" + Math.random() * 100 + "%;--d:" + (Math.random() * 3 + 2) + "s;--l:-" + Math.random() * 4 + "s";
+    w.appendChild(s);
+  }
+})();
+
+document.title = CONFIG.title + " · " + CONFIG.owner;
+$("#ttl").textContent = CONFIG.title;
+$("#intro").textContent = CONFIG.intro;
+$("#of").textContent = "of " + CONFIG.owner + " ♥";
+
+/* ---------- storage ---------- */
+function load() { try { entries = JSON.parse(localStorage.getItem(CONFIG.storageKey) || "[]"); } catch (e) { entries = []; } }
+function save() { try { localStorage.setItem(CONFIG.storageKey, JSON.stringify(entries)); } catch (e) {} }
+
+/* ---------- build the form ---------- */
+function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+
+function buildForm() {
+  var f = $("#form"); f.innerHTML = "";
+
+  var r = el("div", "row"); r.appendChild(el("label", "", "Your name *"));
+  var n = el("input"); n.id = "f-name"; n.maxLength = 40; n.autocomplete = "off"; r.appendChild(n); f.appendChild(r);
+
+  f.appendChild(el("div", "lab", "Your favourite colour"));
+  var sw = el("div", "swatches");
+  CONFIG.colors.forEach(function (c) {
+    var b = el("button", "sw" + (c === state.color ? " on" : "")); b.style.background = c; b.setAttribute("aria-label", "colour " + c);
+    b.onclick = function () { state.color = c; sw.querySelectorAll(".sw").forEach(function (x) { x.classList.toggle("on", x === b); }); };
+    sw.appendChild(b);
+  });
+  f.appendChild(sw);
+
+  Q.forEach(function (q) {
+    if (q.type === "text") {
+      var row = el("div", "row"); row.appendChild(el("label", "", q.label + ":"));
+      var i = el("input"); i.id = "f-" + q.id; i.maxLength = 80; i.autocomplete = "off"; row.appendChild(i); f.appendChild(row);
+    } else if (q.type === "area") {
+      f.appendChild(el("div", "lab", q.label + ":"));
+      var a = el("div", "area"), t = el("textarea"); t.id = "f-" + q.id; t.maxLength = 300; a.appendChild(t); f.appendChild(a);
+    } else {
+      f.appendChild(el("div", "lab", q.label));
+      var ch = el("div", "chips");
+      q.options.forEach(function (o) {
+        var b = el("button", "chip", o);
+        b.onclick = function () { state.choice[q.id] = o; ch.querySelectorAll(".chip").forEach(function (x) { x.classList.toggle("on", x === b); }); };
+        ch.appendChild(b);
+      });
+      f.appendChild(ch);
+    }
+  });
+
+  f.appendChild(el("div", "lab", "Rate our friendship"));
+  var hs = el("div", "hearts");
+  for (var h = 1; h <= 5; h++) (function (v) {
+    var b = el("button", "", "♥"); b.setAttribute("aria-label", v + " of 5");
+    b.onclick = function () { state.rate = v; hs.querySelectorAll("button").forEach(function (x, k) { x.classList.toggle("on", k < v); }); };
+    hs.appendChild(b);
+  })(h);
+  f.appendChild(hs);
+
+  f.appendChild(el("div", "lab", "Pick a sticker for your page"));
+  var sk = el("div", "stickers");
+  CONFIG.stickers.forEach(function (s) {
+    var b = el("button", "st" + (s === state.sticker ? " on" : ""), s);
+    b.onclick = function () { state.sticker = s; sk.querySelectorAll(".st").forEach(function (x) { x.classList.toggle("on", x === b); }); };
+    sk.appendChild(b);
+  });
+  f.appendChild(sk);
+}
+
+/* ---------- submit ---------- */
+function fall() {
+  var bits = ["💖", "✨", "🌸", "⭐", "💕"];
+  for (var i = 0; i < 40; i++) (function (k) {
+    var s = el("span", "fall", bits[k % bits.length]);
+    s.style.left = Math.random() * 100 + "vw"; s.style.fontSize = (14 + Math.random() * 18) + "px";
+    s.style.setProperty("--d", (2.5 + Math.random() * 2.5) + "s"); s.style.setProperty("--x", (Math.random() * 160 - 80) + "px");
+    s.style.animationDelay = Math.random() + "s";
+    document.body.appendChild(s); setTimeout(function () { s.remove(); }, 6500);
+  })(i);
+}
+
+$("#submit").onclick = function () {
+  var name = $("#f-name").value.trim();
+  if (!name) {
+    $("#warn").textContent = "please write your name first 🥺";
+    var p = $("#paper"); p.classList.remove("shake"); void p.offsetWidth; p.classList.add("shake");
+    $("#f-name").focus(); return;
+  }
+  $("#warn").textContent = "";
+  var e = { id: Date.now(), name: name, color: state.color, sticker: state.sticker, rate: state.rate, t: new Date().toISOString(), a: {} };
+  Q.forEach(function (q) {
+    var v = q.type === "choice" ? (state.choice[q.id] || "") : ($("#f-" + q.id).value || "").trim();
+    if (v) e.a[q.id] = v;
+  });
+  entries.unshift(e); save(); freshId = e.id;
+  state.rate = 0; state.choice = {}; buildForm();
+  fall(); render(); tab("read");
+};
+
+/* ---------- read ---------- */
+function render() {
+  $("#cnt").textContent = entries.length;
+  var g = $("#grid"); g.innerHTML = "";
+  $("#tools").style.display = entries.length ? "flex" : "none";
+  if (!entries.length) { g.appendChild(el("div", "empty", "no entries yet…\nbe the first to write in this slam book ✨")); g.firstChild.style.whiteSpace = "pre-line"; return; }
+  entries.forEach(function (e, i) {
+    var c = el("div", "card" + (e.id === freshId ? " fresh" : ""));
+    c.style.setProperty("--c", e.color); c.style.setProperty("--rot", ((i % 3) - 1) * 1.4 + "deg");
+    var top = el("div", "top"); top.appendChild(el("div", "stk", e.sticker));
+    var nm = el("div"); nm.appendChild(el("div", "nm", e.name));
+    if (e.a.nick) nm.appendChild(el("div", "nk", "“" + e.a.nick + "”"));
+    top.appendChild(nm); c.appendChild(top);
+    var body = el("div", "body");
+    Q.forEach(function (q) {
+      if (!e.a[q.id] || q.id === "nick") return;
+      var d = el("div", "qa"); d.appendChild(el("b", "", q.label)); d.appendChild(el("span", "", e.a[q.id])); body.appendChild(d);
+    });
+    if (e.rate) { var d = el("div", "qa"); d.appendChild(el("b", "", "Our friendship")); d.appendChild(el("span", "rate", "♥".repeat(e.rate) + "♡".repeat(5 - e.rate))); body.appendChild(d); }
+    body.appendChild(el("div", "when", new Date(e.t).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })));
+    c.appendChild(body);
+    var x = el("button", "del", "×"); x.setAttribute("aria-label", "Delete this entry");
+    x.onclick = function () { if (confirm("Delete " + e.name + "'s entry?")) { entries = entries.filter(function (z) { return z.id !== e.id; }); save(); render(); } };
+    c.appendChild(x); g.appendChild(c);
+  });
+}
+
+$("#export").onclick = function () {
+  var t = CONFIG.title + " of " + CONFIG.owner + "\n\n";
+  entries.slice().reverse().forEach(function (e) {
+    t += "— " + e.name + (e.a.nick ? " (" + e.a.nick + ")" : "") + " —\n";
+    Q.forEach(function (q) { if (e.a[q.id] && q.id !== "nick") t += q.label + ": " + e.a[q.id] + "\n"; });
+    if (e.rate) t += "Friendship: " + e.rate + "/5\n";
+    t += "\n";
+  });
+  var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([t], { type: "text/plain" })); a.download = "slam-book.txt"; a.click();
+};
+
+/* ---------- tabs ---------- */
+function tab(w) {
+  $("#write").hidden = w !== "write"; $("#read").hidden = w !== "read";
+  $("#tw").classList.toggle("on", w === "write"); $("#tr").classList.toggle("on", w === "read");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+$("#tw").onclick = function () { tab("write"); };
+$("#tr").onclick = function () { freshId = null; render(); tab("read"); };
+
+load(); buildForm(); render();
+</script>
+</body>
+</html>

@@ -85,6 +85,59 @@
       pointer-events: all
     }
 
+    #s-dedication {
+      background: radial-gradient(ellipse 90% 70% at 50% 40%, rgba(200, 16, 46, .18), transparent 65%), #090003
+    }
+
+    .dedication-stage {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      padding: 18px
+    }
+
+    .dedication-title {
+      font-family: var(--fd);
+      color: #e3b955;
+      font-size: clamp(18px, 5vw, 28px);
+      text-align: center;
+      letter-spacing: .06em
+    }
+
+    .dedication-video-wrap {
+      width: min(94vw, 680px);
+      max-height: 78vh;
+      border: 1.5px solid rgba(227, 185, 85, .55);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .65), 0 0 30px rgba(200, 16, 46, .22);
+      background: #000
+    }
+
+    .dedication-video-wrap video {
+      width: 100%;
+      max-height: 78vh;
+      display: block;
+      object-fit: contain
+    }
+
+    .restart-final {
+      display: none;
+      min-width: 170px;
+      min-height: 46px;
+      border: 1.5px solid #e3b955;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #a80f2d, #d72b51);
+      color: #fff7da;
+      font: 700 16px var(--fb);
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(200, 16, 46, .35)
+    }
+
     /* ── SCREEN 0: HEADPHONE PROMPT ── */
     #s-headphone {
       background: radial-gradient(ellipse 80% 48% at 50% 44%, rgba(200, 16, 46, .2), transparent 72%), #000;
@@ -1620,6 +1673,8 @@
     .scr-btns {
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
       opacity: 0;
       transform: translateY(10px);
       pointer-events: none;
@@ -1651,6 +1706,11 @@
     .scr-btn-re {
       background: transparent;
       color: #e3b955
+    }
+
+    .scr-btn-slam {
+      background: linear-gradient(135deg, #a80f2d, #d72b51);
+      color: #fff7da
     }
 
     /* petals */
@@ -2785,6 +2845,7 @@
       <div class="scr-btns" id="scr-btns">
         <button class="scr-btn scr-btn-go" id="scr-celebrate" onclick="scrCelebrate()">Celebrate ✿</button>
         <button class="scr-btn scr-btn-re" id="scr-roll-up" onclick="scrRollUp()">Roll up ↺</button>
+        <button class="scr-btn scr-btn-slam" id="scr-slam" onclick="playDedicatedSong()">This song is dedicated to you 🎵</button>
       </div>
     </div>
   </div>
@@ -2828,6 +2889,18 @@
         <button class="ck-btn main" onclick="ckCelebrate()">Celebrate ✿</button>
         <button class="ck-btn" onclick="ckAgain()">Cut again ↺</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ═══ FINAL: DEDICATED SONG ═══ -->
+  <div class="screen" id="s-dedication">
+    <div class="dedication-stage">
+      <h2 class="dedication-title">This song is dedicated to you ♥</h2>
+      <div class="dedication-video-wrap">
+        <video id="vid-dedication" src="song.mp4" controls playsinline preload="auto"
+          aria-label="A song dedicated to you" onended="dedicationEnded()"></video>
+      </div>
+      <button class="restart-final" id="restart-final" type="button" onclick="restartAll()">Restart ↺</button>
     </div>
   </div>
 
@@ -3787,6 +3860,27 @@
       requestAnimationFrame(function () { applyGalWidths(); galAutoStart(); });
     }
     function ckAgain() { ckStopSong(); ckInit(); }
+
+    function playDedicatedSong() {
+      ckStopSong();
+      sfx("sparkle");
+      var restart = document.getElementById("restart-final");
+      var video = document.getElementById("vid-dedication");
+      if (restart) restart.style.display = "none";
+      if (video) {
+        video.currentTime = 0;
+        showScreen("s-dedication");
+        video.play().catch(function () {});
+      } else {
+        showScreen("s-dedication");
+      }
+    }
+
+    function dedicationEnded() {
+      var restart = document.getElementById("restart-final");
+      if (restart) restart.style.display = "block";
+      sfx("sparkle");
+    }
 
     /* wire up scroll tap */
     (function () {
