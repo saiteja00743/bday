@@ -3711,8 +3711,43 @@
       leaves.forEach(function (l, i) {
         l.onclick = function () { cur = l.classList.contains("flipped") ? i : i + 1; update(); };
       });
-      document.getElementById("d-next").onclick = function () { if (cur < n) { cur++; update(); } };
-      document.getElementById("d-prev").onclick = function () { if (cur > 0) { cur--; update(); } };
+      function bindDiaryControl(button, action) {
+        var touchStart = null;
+        var lastTouch = 0;
+        button.addEventListener("touchstart", function (event) {
+          if (event.touches.length !== 1) { touchStart = null; return; }
+          touchStart = {
+            x: event.touches[0].clientX,
+            y: event.touches[0].clientY
+          };
+        }, { passive: true });
+        button.addEventListener("touchend", function (event) {
+          if (!touchStart || !event.changedTouches.length) return;
+          var touch = event.changedTouches[0];
+          var moved = Math.abs(touch.clientX - touchStart.x) + Math.abs(touch.clientY - touchStart.y);
+          touchStart = null;
+          if (moved > 12) return;
+          event.preventDefault();
+          event.stopPropagation();
+          lastTouch = Date.now();
+          action();
+        }, { passive: false });
+        button.addEventListener("touchcancel", function () { touchStart = null; }, { passive: true });
+        button.addEventListener("click", function (event) {
+          if (Date.now() - lastTouch < 800) {
+            event.preventDefault();
+            return;
+          }
+          action();
+        });
+      }
+
+      bindDiaryControl(document.getElementById("d-next"), function () {
+        if (cur < n) { cur++; update(); }
+      });
+      bindDiaryControl(document.getElementById("d-prev"), function () {
+        if (cur > 0) { cur--; update(); }
+      });
       update();
       diaryReady = true;
       buildStarsFor("st-diary");

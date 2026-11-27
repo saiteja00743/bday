@@ -152,8 +152,35 @@ $("#diary").innerHTML = `<div class="garland"></div><div class="book3d closed" i
     $("#dhint").textContent=cur===0?"tap the book to open":cur===n?"the end":"tap to turn the page";
   };
   L.forEach((l,i)=>l.onclick=()=>{cur=l.classList.contains("flipped")?i:i+1;up()});
-  $("#next").onclick=()=>{if(cur<n){cur++;up()}};
-  $("#prev").onclick=()=>{if(cur>0){cur--;up()}};
+  function bindDiaryControl(button, action) {
+    var touchStart = null;
+    var lastTouch = 0;
+    button.addEventListener("touchstart", function (event) {
+      if (event.touches.length !== 1) { touchStart = null; return; }
+      touchStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    }, { passive: true });
+    button.addEventListener("touchend", function (event) {
+      if (!touchStart || !event.changedTouches.length) return;
+      var touch = event.changedTouches[0];
+      var moved = Math.abs(touch.clientX - touchStart.x) + Math.abs(touch.clientY - touchStart.y);
+      touchStart = null;
+      if (moved > 12) return;
+      event.preventDefault();
+      event.stopPropagation();
+      lastTouch = Date.now();
+      action();
+    }, { passive: false });
+    button.addEventListener("touchcancel", function () { touchStart = null; }, { passive: true });
+    button.addEventListener("click", function (event) {
+      if (Date.now() - lastTouch < 800) {
+        event.preventDefault();
+        return;
+      }
+      action();
+    });
+  }
+  bindDiaryControl($("#next"), function () { if (cur < n) { cur++; up(); } });
+  bindDiaryControl($("#prev"), function () { if (cur > 0) { cur--; up(); } });
   up();
 })();
 </script>
