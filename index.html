@@ -125,17 +125,36 @@
       object-fit: contain
     }
 
-    .restart-final {
+    .dedication-actions {
       display: none;
-      min-width: 170px;
-      min-height: 46px;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px
+    }
+
+    .dedication-actions.show {
+      display: flex
+    }
+
+    .dedication-action {
+      min-width: 135px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 18px;
       border: 1.5px solid #e3b955;
       border-radius: 999px;
+      background: rgba(15, 0, 5, .82);
+      color: #ffe6a8;
+      font: 700 15px var(--fb);
+      text-decoration: none;
+      cursor: pointer
+    }
+
+    .dedication-action.primary {
       background: linear-gradient(135deg, #a80f2d, #d72b51);
-      color: #fff7da;
-      font: 700 16px var(--fb);
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(200, 16, 46, .35)
+      color: #fff7da
     }
 
     /* ── SCREEN 0: HEADPHONE PROMPT ── */
@@ -2898,9 +2917,13 @@
       <h2 class="dedication-title">This song is dedicated to you ♥</h2>
       <div class="dedication-video-wrap">
         <video id="vid-dedication" src="song.mp4" controls playsinline preload="auto"
-          aria-label="A song dedicated to you" onended="dedicationEnded()"></video>
+          aria-label="A song dedicated to you" onplay="dedicationPlaying()" onended="dedicationEnded()"></video>
       </div>
-      <button class="restart-final" id="restart-final" type="button" onclick="restartAll()">Restart ↺</button>
+      <div class="dedication-actions" id="dedication-actions">
+        <button class="dedication-action primary" type="button" onclick="replayDedicatedSong()">Replay video ↺</button>
+        <a class="dedication-action" href="song.mp4" download="dedicated-song.mp4">Download video ↓</a>
+        <button class="dedication-action" type="button" onclick="restartAll()">Restart from beginning</button>
+      </div>
     </div>
   </div>
 
@@ -3275,7 +3298,7 @@
       var el = document.getElementById(id); if (el) el.classList.add("active");
       curScreen = id;
       var musicButton = document.getElementById("music-btn");
-      if (musicButton) musicButton.style.display = (id === "s-edit" || id === "s-headphone") ? "none" : "";
+      if (musicButton) musicButton.style.display = (id === "s-edit" || id === "s-headphone" || id === "s-dedication") ? "none" : "";
       var vidMap = { "s-load": "vid-load", "s-special": "vid-special", "s-memvid": "vid-memvid", "s-count": "vid-count" };
       Object.keys(vidMap).forEach(function (screenId) {
         var video = document.getElementById(vidMap[screenId]);
@@ -3864,22 +3887,43 @@
     function playDedicatedSong() {
       ckStopSong();
       sfx("sparkle");
-      var restart = document.getElementById("restart-final");
+      var backgroundMusic = document.getElementById("bg-music");
+      var musicButton = document.getElementById("music-btn");
       var video = document.getElementById("vid-dedication");
-      if (restart) restart.style.display = "none";
+      var actions = document.getElementById("dedication-actions");
+      if (backgroundMusic) backgroundMusic.pause();
+      musicOn = false;
+      if (musicButton) musicButton.textContent = "🔇";
+      if (actions) actions.classList.remove("show");
       if (video) {
         video.currentTime = 0;
         showScreen("s-dedication");
-        video.play().catch(function () {});
+        video.play().catch(function (error) {
+          if (error.name !== "NotAllowedError") console.error("Unable to play the dedicated song:", error);
+        });
       } else {
         showScreen("s-dedication");
       }
     }
 
+    function dedicationPlaying() {
+      var actions = document.getElementById("dedication-actions");
+      if (actions) actions.classList.remove("show");
+    }
+
     function dedicationEnded() {
-      var restart = document.getElementById("restart-final");
-      if (restart) restart.style.display = "block";
+      var actions = document.getElementById("dedication-actions");
+      if (actions) actions.classList.add("show");
       sfx("sparkle");
+    }
+
+    function replayDedicatedSong() {
+      var video = document.getElementById("vid-dedication");
+      if (!video) return;
+      video.currentTime = 0;
+      video.play().catch(function (error) {
+        if (error.name !== "NotAllowedError") console.error("Unable to replay the dedicated song:", error);
+      });
     }
 
     /* wire up scroll tap */
@@ -3893,8 +3937,31 @@
     })();
 
     function restartAll() {
-      sfx("whoosh"); resetCode(); stopHearts();
-      setTimeout(function () { showScreen("s-lock"); }, 400);
+      sfx("whoosh");
+      resetCode();
+      stopHearts();
+      clearTimeout(cakeAdvanceTimer);
+      cakeAdvanceTimer = null;
+      ckStopSong();
+
+      var backgroundMusic = document.getElementById("bg-music");
+      var dedicatedVideo = document.getElementById("vid-dedication");
+      var editVideo = document.getElementById("vid-edit");
+      var headphoneScreen = document.getElementById("s-headphone");
+      var musicButton = document.getElementById("music-btn");
+      var actions = document.getElementById("dedication-actions");
+      if (backgroundMusic) { backgroundMusic.pause(); backgroundMusic.currentTime = 0; }
+      if (dedicatedVideo) { dedicatedVideo.pause(); dedicatedVideo.currentTime = 0; }
+      if (editVideo) { editVideo.pause(); editVideo.currentTime = 0; }
+      if (headphoneScreen) {
+        delete headphoneScreen.dataset.leaving;
+        headphoneScreen.style.opacity = "";
+        headphoneScreen.style.transition = "";
+      }
+      if (musicButton) musicButton.textContent = "🔇";
+      if (actions) actions.classList.remove("show");
+      musicOn = false;
+      showScreen("s-headphone");
     }
 
     /* ══════════════════════════════════════
